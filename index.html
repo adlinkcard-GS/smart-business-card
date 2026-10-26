@@ -83,7 +83,7 @@
   .co { text-align:center; font-size:13px; margin-top:3px; color:var(--soft); }
   .divd { display:flex; align-items:center; gap:10px; margin:18px 48px; }
   .divd i { flex:1; height:1px; } .divd b { width:7px; height:7px; transform:rotate(45deg); }
-  .num { display:flex; align-items:center; gap:13px; margin:0 18px 10px; padding:12px 15px; border-radius:16px; background:#fff;
+  .num { display:flex; align-items:center; gap:13px; margin:0 18px 10px; padding:14px 15px; border-radius:16px; background:#fff;
          box-shadow:0 4px 14px rgba(0,0,0,.08); text-decoration:none; }
   .num .ic { width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex:none; }
   .num .ic svg { width:19px; height:19px; fill:#fff; }
@@ -113,7 +113,7 @@
   .foot2 { text-align:center; font-size:10.5px; letter-spacing:1.5px; color:var(--ink); opacity:.45; padding:18px 0 22px; }
 
   /* ---------- language switch + Arabic ---------- */
-  .lang { position:absolute; top:calc(14px + env(safe-area-inset-top,0px)); inset-inline-end:14px; z-index:2; display:flex;
+  .lang { position:absolute; top:calc(14px + env(safe-area-inset-top,0px)); right:14px; left:auto; direction:ltr; z-index:2; display:flex;
           border-radius:20px; overflow:hidden; border:1px solid rgba(255,255,255,.45); background:rgba(0,0,0,.18); }
   .lang button { border:0; background:transparent; color:inherit; font:inherit; font-size:12px; padding:4px 11px; cursor:pointer; opacity:.7; }
   .lang button.on { background:rgba(255,255,255,.9); color:#1A1A1A; opacity:1; font-weight:700; }
@@ -282,10 +282,8 @@
     var m = d.colors.main, a = d.colors.accent, bg = d.colors.bg;
     var tt = lum(a) < 200 ? a : m;
     function num(label, n) {
-      var c = country(n);
       return '<a class="num" href="tel:+' + n + '"><div class="ic" style="background:' + grad(m, .15, -.1) + '">' + svg("call") +
-             "</div><div><small>" + (c ? '<span class="flag">' + flag(c) + "</span> " + c + " · " : "") + label + "</small>" +
-             '<b><bdi dir="ltr">' + esc(showPhone(n)) + '</bdi></b></div><div class="ch">' + (LANG === "ar" ? "‹" : "›") + "</div></a>";
+             '</div><div><b><bdi dir="ltr">' + esc(showPhone(n)) + '</bdi></b></div><div class="ch">' + (LANG === "ar" ? "‹" : "›") + "</div></a>";
     }
     function item(k, label, href) {
       return '<a class="it" href="' + esc(href) + '"' + (/^https?:/.test(href) ? ' target="_blank" rel="noopener"' : "") + '>' +
