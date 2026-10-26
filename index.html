@@ -123,6 +123,8 @@
   .num .ch { margin-left:0; margin-inline-start:auto; }
   .wallet2 .tx { text-align:start; }
   .flag { font-size:13px; }
+  .cc { display:inline-block; font-size:11px; font-weight:700; letter-spacing:1px; border:1.5px solid; border-radius:6px;
+        padding:1px 6px; margin-inline-end:9px; vertical-align:2px; }
 </style>
 </head>
 <body>
@@ -282,8 +284,10 @@
     var m = d.colors.main, a = d.colors.accent, bg = d.colors.bg;
     var tt = lum(a) < 200 ? a : m;
     function num(label, n) {
+      var c = country(n);                 // one small country tag (LB, US, IQ...) next to the number
       return '<a class="num" href="tel:+' + n + '"><div class="ic" style="background:' + grad(m, .15, -.1) + '">' + svg("call") +
-             '</div><div><b><bdi dir="ltr">' + esc(showPhone(n)) + '</bdi></b></div><div class="ch">' + (LANG === "ar" ? "‹" : "›") + "</div></a>";
+             '</div><div>' + (c ? '<span class="cc" style="color:' + tt + ';border-color:' + tt + '">' + c + "</span>" : "") +
+             '<b><bdi dir="ltr">' + esc(showPhone(n)) + '</bdi></b></div><div class="ch">' + (LANG === "ar" ? "‹" : "›") + "</div></a>";
     }
     function item(k, label, href) {
       return '<a class="it" href="' + esc(href) + '"' + (/^https?:/.test(href) ? ' target="_blank" rel="noopener"' : "") + '>' +
