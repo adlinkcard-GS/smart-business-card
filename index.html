@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1E2761">
+<title>Smart Business Card · ADLINKCARD</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💼</text></svg>">
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<style>
+  /* =========================================================
+     ADLINKCARD · Smart Business Card · profile + photo page
+     ========================================================= */
+  :root { --main:#1E2761; --accent:#1E2761; --bg:#F3F5F9; --onMain:#fff; --onAccent:#fff; --ink:#1A1A1A; --soft:rgba(0,0,0,.6); }
+  * { box-sizing:border-box; }
+  html, body { margin:0; }
+  body { font-family:system-ui,-apple-system,"Segoe UI",Roboto,Tahoma,sans-serif; background:var(--bg); color:var(--ink);
+         min-height:100vh; padding-bottom:env(safe-area-inset-bottom,0px); }
+  .wrap { max-width:440px; margin:0 auto; }
+  .head { background:var(--main); color:var(--onMain); text-align:center;
+          padding:calc(26px + env(safe-area-inset-top,0px)) 20px 66px; }
+  .head img { max-height:64px; max-width:220px; object-fit:contain; display:block; margin:0 auto; }
+  .head .brand { font-weight:700; letter-spacing:1.5px; font-size:15px; }
+  .body { padding:0 18px 22px; text-align:center; }
+  .photo { width:116px; height:116px; border-radius:50%; margin:-58px auto 12px; border:4px solid #fff;
+           background:var(--accent); color:var(--onAccent); display:flex; align-items:center; justify-content:center;
+           font-size:38px; font-weight:600; overflow:hidden; }
+  .photo img { width:100%; height:100%; object-fit:cover; display:block; }
+  h1 { margin:0; font-size:23px; font-weight:700; }
+  .sub { color:var(--soft); font-size:15px; margin:4px 0 18px; }
+  .btn { display:flex; align-items:center; gap:12px; width:100%; border:0; border-radius:12px; padding:13px 16px;
+         font:inherit; font-size:16px; font-weight:600; text-decoration:none; margin-bottom:9px; cursor:pointer;
+         background:var(--accent); color:var(--onAccent); text-align:left; }
+  .btn svg { width:21px; height:21px; flex:none; fill:currentColor; }
+  .btn.main { background:var(--main); color:var(--onMain); justify-content:center; }
+  .btn.wallet { background:#000; color:#fff; justify-content:center; }
+  .btn:focus-visible { outline:3px solid #7FA7D6; outline-offset:2px; }
+  .small { display:block; font-size:13px; color:var(--soft); margin:2px 0 10px; }
+  .share { background:var(--main); color:var(--onMain); border-radius:16px; padding:18px 14px 16px; margin-top:16px; }
+  .share b { display:block; font-size:15px; margin-bottom:12px; }
+  .tile { position:relative; width:220px; height:220px; margin:0 auto; background:#fff; border-radius:18px;
+          box-shadow:0 8px 22px rgba(0,0,0,.22), 0 1px 4px rgba(0,0,0,.14); }
+  .tile canvas { position:absolute; inset:0; width:220px; height:220px; }
+  .share .hint { font-size:13px; opacity:.8; margin-top:12px; }
+  .share .btn { margin:12px 0 0; justify-content:center; background:#fff; color:#1A1A1A; }
+  .foot { text-align:center; font-size:12px; color:var(--soft); margin:24px 0 6px; }
+  .foot b { letter-spacing:.5px; }
+  .msg { background:#fff; border-radius:14px; padding:18px; margin-top:20px; line-height:1.6; font-size:15px; }
+  .ar { direction:rtl; }
+  .wait { display:flex; justify-content:center; padding:120px 0; }
+  .dot { width:10px; height:10px; margin:0 4px; border-radius:50%; background:var(--main); animation:b 1s infinite alternate; }
+  .dot:nth-child(2) { animation-delay:.2s; } .dot:nth-child(3) { animation-delay:.4s; }
+  @keyframes b { to { opacity:.2; } }
+  @media (prefers-reduced-motion: reduce) { .dot { animation:none; } }
+  /* photo page */
+  .frame { width:150px; height:150px; border-radius:50%; margin:-75px auto 14px; border:4px solid #fff; background:#E7EEF6;
+           overflow:hidden; display:flex; align-items:center; justify-content:center; }
+  .frame img { width:100%; height:100%; object-fit:cover; }
+  .pick { background:#fff; color:var(--main); border:2px solid var(--main); justify-content:center; }
+  .btn:disabled { opacity:.45; cursor:default; }
+  .ok { background:#E5F4EC; color:#1E7B4F; } .err { background:#FBE9E7; color:#B3261E; }
+  input[type=file] { display:none; }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"><div class="wait"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div></div>
+<script>
+  /* =========================================================
+     Paste YOUR Smart Business Card web app link (ends with /exec):
+     ========================================================= */
+  var API = "https://script.google.com/macros/s/AKfycbyKvrtSPbiceo9UHkkaRkx89DGu25S-814bRciudDgyrvUSfYxbBerAEJ1Zf_BtRNc/exec";
+
+  var Q = new URLSearchParams(location.search);
+  var CARD = (Q.get("c") || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  var KEY = (Q.get("k") || "").toLowerCase().replace(/[^a-f0-9]/g, "");
+  var app = document.getElementById("app");
+
+  var ICON = {
+    call: '<path d="M6.6 10.8a15.2 15.2 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1z"/>',
+    wa: '<path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.7.3-.2.3-.9.9-.9 2.2s.9 2.5 1 2.7c.1.2 1.8 2.8 4.4 3.9 1.6.7 2.3.8 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/>',
+    mail: '<path d="M20 4H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 4-8 5-8-5V6l8 5 8-5z"/>',
+    web: '<path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm6.9 6h-3a15.6 15.6 0 0 0-1.4-3.6A8 8 0 0 1 18.9 8zM12 4c.8 1.2 1.5 2.5 1.9 4h-3.8c.4-1.4 1.1-2.8 1.9-4zM4.3 14a8.2 8.2 0 0 1 0-4h3.4a16.5 16.5 0 0 0 0 4zm.8 2h3a15.6 15.6 0 0 0 1.4 3.6A8 8 0 0 1 5.1 16zm3-8h-3a8 8 0 0 1 4.3-3.6C8.8 5.5 8.4 6.7 8.1 8zM12 20c-.8-1.2-1.5-2.5-1.9-4h3.8c-.4 1.4-1.1 2.8-1.9 4zm2.3-6H9.7a14.7 14.7 0 0 1 0-4h4.6a14.7 14.7 0 0 1 0 4zm.3 5.6c.6-1.1 1.1-2.3 1.4-3.6h3a8 8 0 0 1-4.4 3.6zm1.7-5.6a16.5 16.5 0 0 0 0-4h3.4a8.2 8.2 0 0 1 0 4z"/>',
+    ig: '<path d="M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 8.2a3.2 3.2 0 1 1 0-6.4 3.2 3.2 0 0 1 0 6.4zM17.3 5.5a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4zM21.9 7.3c-.1-1.6-.4-3-1.6-4.1-1.1-1.2-2.5-1.5-4.1-1.6-1.6-.1-6.6-.1-8.3 0-1.6.1-3 .4-4.1 1.6C2.6 4.3 2.2 5.7 2.1 7.3c-.1 1.6-.1 6.6 0 8.3.1 1.6.4 3 1.6 4.1 1.1 1.1 2.5 1.5 4.1 1.6 1.6.1 6.6.1 8.3 0 1.6-.1 3-.4 4.1-1.6 1.1-1.1 1.5-2.5 1.6-4.1.2-1.6.2-6.6.1-8.3zm-2.1 10.4c-.3.9-1 1.5-1.8 1.8-1.3.5-4.3.4-5.7.4s-4.4.1-5.7-.4c-.9-.3-1.5-1-1.8-1.8-.5-1.3-.4-4.3-.4-5.7s-.1-4.4.4-5.7c.3-.9 1-1.5 1.8-1.8 1.3-.5 4.3-.4 5.7-.4s4.4-.1 5.7.4c.9.3 1.5 1 1.8 1.8.5 1.3.4 4.3.4 5.7s.1 4.4-.4 5.7z"/>',
+    fb: '<path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.3v7A10 10 0 0 0 22 12z"/>',
+    li: '<path d="M20.4 2H3.6C2.7 2 2 2.7 2 3.6v16.8c0 .9.7 1.6 1.6 1.6h16.8c.9 0 1.6-.7 1.6-1.6V3.6c0-.9-.7-1.6-1.6-1.6zM8 19H5V9.5h3zM6.5 8.2a1.7 1.7 0 1 1 0-3.5 1.7 1.7 0 0 1 0 3.5zM19 19h-3v-4.6c0-1.1 0-2.5-1.5-2.5S12.8 13 12.8 14.3V19h-3V9.5h2.8v1.3c.4-.8 1.4-1.5 2.9-1.5 3 0 3.6 2 3.6 4.6z"/>',
+    tt: '<path d="M16.6 2h-3.3v13.6a2.9 2.9 0 1 1-2-2.8V9.5a6.2 6.2 0 1 0 5.3 6.1V8.9a7.9 7.9 0 0 0 4.4 1.4V7a4.4 4.4 0 0 1-4.4-4.4z"/>',
+    pin: '<path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/>',
+    save: '<path d="M19 3H5a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm-7 3a3 3 0 1 1 0 6 3 3 0 0 1 0-6zm6 12H6v-1c0-2 4-3.1 6-3.1s6 1.1 6 3.1z"/>',
+    wallet: '<path d="M21 7H5a1 1 0 0 1 0-2h14V3H5a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h16a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1zm-3 8a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>',
+    share: '<path d="M18 16a3 3 0 0 0-2.4 1.2l-6.7-3.4a3 3 0 0 0 0-1.6l6.7-3.4A3 3 0 1 0 15 7l-6.7 3.4a3 3 0 1 0 0 3.2L15 17a3 3 0 1 0 3-1z"/>'
+  };
+  function svg(k) { return '<svg viewBox="0 0 24 24" aria-hidden="true">' + ICON[k] + '</svg>'; }
+  function esc(s) { return String(s || "").replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function lum(h) { h = h.replace("#", ""); return 0.299 * parseInt(h.substr(0, 2), 16) + 0.587 * parseInt(h.substr(2, 2), 16) + 0.114 * parseInt(h.substr(4, 2), 16); }
+  function on(h) { return lum(h) > 160 ? "#1A1A1A" : "#FFFFFF"; }
+  function setColors(c) {
+    var r = document.documentElement.style;
+    r.setProperty("--main", c.main); r.setProperty("--accent", c.accent); r.setProperty("--bg", c.bg);
+    r.setProperty("--onMain", on(c.main)); r.setProperty("--onAccent", on(c.accent));
+    r.setProperty("--ink", on(c.bg)); r.setProperty("--soft", on(c.bg) === "#FFFFFF" ? "rgba(255,255,255,.75)" : "rgba(0,0,0,.6)");
+    document.querySelector('meta[name="theme-color"]').setAttribute("content", c.main);
+  }
+  function initials(n) { return String(n || "?").trim().split(/\s+/).slice(0, 2).map(function (w) { return w.charAt(0); }).join("").toUpperCase(); }
+  function http(u) { u = String(u || "").trim(); return !u ? "" : /^https?:\/\//i.test(u) ? u : "https://" + u.replace(/^\/+/, ""); }
+  function social(v, base) {
+    v = String(v || "").trim(); if (!v) return "";
+    if (/^https?:\/\//i.test(v) || /\.(com|net|me)\//i.test(v)) return http(v);
+    return base + v.replace(/^@/, "");
+  }
+  function msg(cls, en, ar) { return '<div class="msg ' + (cls || "") + '">' + en + '<div class="ar">' + ar + "</div></div>"; }
+  var FOOT = '<div class="foot">Powered by <b>ADLINKCARD</b> · Grow Smarter</div>';
+
+  /* ---------- styled QR (same look as the printed card) ---------- */
+  function drawQR(canvas, text, d) {
+    var px = 220, dpr = window.devicePixelRatio || 1, cv = canvas;
+    cv.width = px * dpr; cv.height = px * dpr;
+    var g = cv.getContext("2d"); g.scale(dpr, dpr);
+    var q = qrcode(0, "H"); q.addData(text); q.make();
+    var n = q.getModuleCount(), pad = 26, cs = (px - 2 * pad) / n, mid = Math.floor(n / 2), half = Math.floor(n * 0.24 / 2);
+    var dark = lum(d.colors.main) < 140 ? d.colors.main : "#1A1A1A";
+    var eye = lum(d.colors.accent) < 170 ? d.colors.accent : dark;
+    function rr(x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+    function finder(r, c) { return (r < 8 && c < 8) || (r < 8 && c >= n - 8) || (r >= n - 8 && c < 8); }
+    g.fillStyle = dark;
+    for (var r = 0; r < n; r++) for (var c = 0; c < n; c++) {
+      if (finder(r, c) || (Math.abs(r - mid) <= half && Math.abs(c - mid) <= half) || !q.isDark(r, c)) continue;
+      rr(pad + c * cs + cs * .04, pad + r * cs + cs * .04, cs * .92, cs * .92, cs * .25); g.fill();
+    }
+    [[0, 0], [0, n - 7], [n - 7, 0]].forEach(function (f) {
+      var X = pad + f[1] * cs, Y = pad + f[0] * cs;
+      g.strokeStyle = eye; g.lineWidth = cs; rr(X + cs * .5, Y + cs * .5, cs * 6, cs * 6, cs * 1.6); g.stroke();
+      g.fillStyle = dark; rr(X + cs * 2, Y + cs * 2, cs * 3, cs * 3, cs * .9); g.fill();
+    });
+    // scan corners (accent)
+    g.strokeStyle = d.colors.accent; g.lineWidth = 5; g.lineCap = "round";
+    [[10, 10, 1, 1], [px - 10, 10, -1, 1], [10, px - 10, 1, -1], [px - 10, px - 10, -1, -1]].forEach(function (k) {
+      g.beginPath(); g.moveTo(k[0] + k[2] * 26, k[1]); g.lineTo(k[0], k[1]); g.lineTo(k[0], k[1] + k[3] * 26); g.stroke();
+    });
+    // logo in the middle
+    var b = (2 * half + 1) * cs, cx = pad + mid * cs + cs / 2, cy = cx;
+    g.fillStyle = "#fff"; rr(cx - b / 2, cy - b / 2, b, b, cs * 1.2); g.fill();
+    var inner = b - cs * 1.4;
+    if (d.logo) {
+      var im = new Image();
+      im.onload = function () {
+        var s = Math.min(inner / im.width, inner / im.height);
+        g.drawImage(im, cx - im.width * s / 2, cy - im.height * s / 2, im.width * s, im.height * s);
+      };
+      im.src = d.logo;
+    } else {
+      g.fillStyle = d.colors.main; rr(cx - inner / 2, cy - inner / 2, inner, inner, cs); g.fill();
+      g.fillStyle = on(d.colors.main); g.font = "600 " + Math.round(inner * .42) + "px system-ui,sans-serif";
+      g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(initials(d.company || d.name), cx, cy + 1);
+    }
+  }
+
+  /* ---------- vCard (Save contact) ---------- */
+  function fold(line) { var out = [], s = line; while (s.length > 74) { out.push(s.slice(0, 74)); s = " " + s.slice(74); } out.push(s); return out.join("\r\n"); }
+  function ve(s) { return String(s || "").replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\n/g, "\\n"); }
+  function saveContact(d) {
+    var parts = String(d.name || "").trim().split(/\s+/), first = parts.shift() || "", last = parts.join(" ");
+    var L = ["BEGIN:VCARD", "VERSION:3.0", "N:" + ve(last) + ";" + ve(first) + ";;;", "FN:" + ve(d.name)];
+    if (d.company) L.push("ORG:" + ve(d.company));
+    if (d.job) L.push("TITLE:" + ve(d.job));
+    if (d.mobile) L.push("TEL;TYPE=CELL:+" + d.mobile);
+    if (d.mobile2) L.push("TEL;TYPE=CELL:+" + d.mobile2);
+    if (d.office) L.push("TEL;TYPE=WORK:+" + d.office);
+    if (d.email) L.push("EMAIL;TYPE=INTERNET:" + d.email);
+    if (d.website) L.push("URL:" + http(d.website));
+    L.push("URL;TYPE=Smart Card:" + d.link);
+    [["instagram", "https://instagram.com/"], ["facebook", "https://facebook.com/"], ["linkedin", "https://linkedin.com/in/"], ["tiktok", "https://tiktok.com/@"]].forEach(function (s) {
+      if (d[s[0]]) L.push("X-SOCIALPROFILE;TYPE=" + s[0] + ":" + social(d[s[0]], s[1]));
+    });
+    if (d.photo) L.push(fold("PHOTO;ENCODING=b;TYPE=JPEG:" + d.photo.split(",")[1]));
+    L.push("END:VCARD");
+    var blob = new Blob([L.join("\r\n") + "\r\n"], { type: "text/vcard;charset=utf-8" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = (d.name || "contact").replace(/[\\\/:*?"<>|]/g, "") + ".vcf";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+  }
+
+  /* ---------- profile ---------- */
+  function renderProfile(d) {
+    setColors(d.colors);
+    document.title = d.name + " · Smart Business Card";
+    var b = [];
+    if (d.mobile) b.push('<a class="btn" href="tel:+' + d.mobile + '">' + svg("call") + "Call</a>");
+    if (d.mobile) b.push('<a class="btn" href="https://wa.me/' + d.mobile + '" target="_blank" rel="noopener">' + svg("wa") + "WhatsApp</a>");
+    if (d.mobile2) b.push('<a class="btn" href="tel:+' + d.mobile2 + '">' + svg("call") + "Call (mobile 2)</a>");
+    if (d.office) b.push('<a class="btn" href="tel:+' + d.office + '">' + svg("call") + "Office</a>");
+    if (d.email) b.push('<a class="btn" href="mailto:' + esc(d.email) + '">' + svg("mail") + "Email</a>");
+    if (d.website) b.push('<a class="btn" href="' + esc(http(d.website)) + '" target="_blank" rel="noopener">' + svg("web") + "Website</a>");
+    if (d.instagram) b.push('<a class="btn" href="' + esc(social(d.instagram, "https://instagram.com/")) + '" target="_blank" rel="noopener">' + svg("ig") + "Instagram</a>");
+    if (d.facebook) b.push('<a class="btn" href="' + esc(social(d.facebook, "https://facebook.com/")) + '" target="_blank" rel="noopener">' + svg("fb") + "Facebook</a>");
+    if (d.linkedin) b.push('<a class="btn" href="' + esc(social(d.linkedin, "https://linkedin.com/in/")) + '" target="_blank" rel="noopener">' + svg("li") + "LinkedIn</a>");
+    if (d.tiktok) b.push('<a class="btn" href="' + esc(social(d.tiktok, "https://tiktok.com/@")) + '" target="_blank" rel="noopener">' + svg("tt") + "TikTok</a>");
+    if (d.location) b.push('<a class="btn" href="' + esc(http(d.location)) + '" target="_blank" rel="noopener">' + svg("pin") + "Find us</a>");
+    var sub = [d.job, d.company].filter(function (x) { return x; }).map(esc).join(" · ");
+    app.innerHTML =
+      '<div class="head">' + (d.logo ? '<img alt="' + esc(d.company || "Logo") + '" src="' + d.logo + '">' : '<div class="brand">' + esc((d.company || "ADLINKCARD").toUpperCase()) + "</div>") + "</div>" +
+      '<div class="body">' +
+        '<div class="photo">' + (d.photo ? '<img alt="' + esc(d.name) + '" src="' + d.photo + '">' : esc(initials(d.name))) + "</div>" +
+        '<h1 dir="auto">' + esc(d.name) + "</h1>" +
+        '<div class="sub" dir="auto">' + sub + "</div>" +
+        b.join("") +
+        '<button class="btn main" id="save">' + svg("save") + "Save contact</button>" +
+        (d.pass ? '<a class="btn wallet" href="' + esc(d.pass) + '" target="_blank" rel="noopener">' + svg("wallet") + "Add to Wallet</a>" +
+                  (d.huawei ? '<a class="small" href="' + esc(d.huawei) + '">Huawei phone? Get the pass here</a>' : "") : "") +
+        '<div class="share"><b>' + svg("share").replace("<svg", '<svg style="width:16px;height:16px;vertical-align:-3px;fill:currentColor"') + " Share my card</b>" +
+          '<div class="tile"><canvas id="qr" aria-label="QR code of this card"></canvas></div>' +
+          '<div class="hint">Show this to a friend to scan</div>' +
+          '<button class="btn" id="shareBtn">' + svg("share") + "Send my card link</button>" +
+        "</div>" + FOOT +
+      "</div>";
+    document.getElementById("save").onclick = function () { saveContact(d); };
+    document.getElementById("shareBtn").onclick = function () {
+      var t = this;
+      if (navigator.share) { navigator.share({ title: d.name, url: d.link }).catch(function () {}); return; }
+      navigator.clipboard.writeText(d.link).then(function () { t.lastChild.textContent = "Link copied ✓"; }).catch(function () { prompt("Copy this link:", d.link); });
+    };
+    if (window.qrcode) drawQR(document.getElementById("qr"), d.link, d);
+  }
+
+  function loadProfile() {
+    var cached = null;
+    try { cached = JSON.parse(localStorage.getItem("sbc_" + CARD) || "null"); } catch (e) {}
+    if (cached && cached.ok) renderProfile(cached);
+    fetch(API + "?api=profile&c=" + encodeURIComponent(CARD))
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (d.ok) {
+          try { localStorage.setItem("sbc_" + CARD, JSON.stringify(d)); } catch (e) {}
+          if (!cached || JSON.stringify(cached) !== JSON.stringify(d)) renderProfile(d);
+        } else {
+          try { localStorage.removeItem("sbc_" + CARD); } catch (e) {}
+          app.innerHTML = '<div class="head"><div class="brand">ADLINKCARD</div></div><div class="body">' +
+            (d.reason === "inactive"
+              ? msg("", "This card is not active at the moment.", "هذه البطاقة غير مفعّلة حالياً.")
+              : msg("err", "This card link is not valid.", "رابط البطاقة غير صالح.")) + FOOT + "</div>";
+        }
+      })
+      .catch(function () {
+        if (!cached) app.innerHTML = '<div class="body" style="padding-top:40px">' +
+          msg("err", "Could not load the card. Check your internet and try again.", "تعذّر تحميل البطاقة. تحقق من الإنترنت وحاول مجدداً.") + "</div>";
+      });
+  }
+
+  /* ---------- photo upload (?c=...&k=...) ---------- */
+  function loadPhotoPage() {
+    fetch(API + "?api=check&c=" + encodeURIComponent(CARD) + "&k=" + encodeURIComponent(KEY))
+      .then(function (r) { return r.json(); })
+      .then(function (s) {
+        if (!s.ok) { app.innerHTML = '<div class="body" style="padding-top:40px">' + msg("err", "This link is not valid.", "هذا الرابط غير صالح.") + FOOT + "</div>"; return; }
+        app.innerHTML =
+          '<div class="head"><div class="brand">YOUR CARD PHOTO</div><div class="ar" style="opacity:.85">صورة بطاقتك</div></div>' +
+          '<div class="body"><div class="frame" id="frame">' + svg("save").replace("<svg", '<svg style="width:70px;fill:#1E2761;opacity:.3"') + "</div>" +
+          '<h1 dir="auto">' + esc(s.name) + '</h1><div class="sub">' + esc(s.company) + "</div>" +
+          (s.photo ? msg("", "A photo was already received. A new one will replace it.", "تم استلام صورة سابقاً. الصورة الجديدة ستستبدلها.") : "") +
+          '<p style="font-size:14px;line-height:1.6">A clear photo of your face, looking at the camera.<br><span class="ar">صورة واضحة للوجه، النظر إلى الكاميرا.</span></p>' +
+          '<label class="btn pick" for="file" tabindex="0" id="pickBtn">Choose photo | اختر صورة</label><input type="file" id="file" accept="image/*">' +
+          '<button class="btn main" id="send" disabled>Upload photo | تحميل الصورة</button><div id="out"></div>' + FOOT + "</div>";
+        var jpeg = null, out = document.getElementById("out"), send = document.getElementById("send");
+        document.getElementById("pickBtn").onkeydown = function (ev) { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); document.getElementById("file").click(); } };
+        document.getElementById("file").onchange = function (ev) {
+          var f = ev.target.files[0]; if (!f) return;
+          jpeg = null; send.disabled = true; out.innerHTML = "";
+          var img = new Image();
+          img.onload = function () {
+            var side = Math.min(img.naturalWidth, img.naturalHeight), S = Math.min(700, side);    // square crop, 700px
+            var cv = document.createElement("canvas"); cv.width = S; cv.height = S;
+            var cx = cv.getContext("2d"); cx.fillStyle = "#fff"; cx.fillRect(0, 0, S, S);
+            cx.drawImage(img, (img.naturalWidth - side) / 2, (img.naturalHeight - side) / 2, side, side, 0, 0, S, S);
+            var url = cv.toDataURL("image/jpeg", 0.85); jpeg = url.split(",")[1];
+            document.getElementById("frame").innerHTML = '<img alt="Selected photo" src="' + url + '">';
+            send.disabled = false; URL.revokeObjectURL(img.src);
+          };
+          img.onerror = function () { out.innerHTML = msg("err", "This photo format is not supported. Choose a JPG or PNG.", "صيغة الصورة غير مدعومة. اختر JPG أو PNG."); };
+          img.src = URL.createObjectURL(f);
+        };
+        send.onclick = function () {
+          if (!jpeg) return;
+          send.disabled = true; send.textContent = "Uploading… | جارٍ التحميل…";
+          fetch(API, { method: "POST", body: JSON.stringify({ action: "photo", c: CARD, k: KEY, img: jpeg }) })
+            .then(function (r) { return r.json(); })
+            .then(function (r) {
+              send.textContent = "Upload photo | تحميل الصورة";
+              if (r.ok) { out.innerHTML = msg("ok", "Photo received. Thank you! 🎉", "تم استلام الصورة. شكراً لكم!"); jpeg = null; try { localStorage.removeItem("sbc_" + CARD); } catch (e) {} }
+              else { send.disabled = false; out.innerHTML = msg("err", "The photo was not uploaded. Please try again.", "لم يتم تحميل الصورة. حاول مجدداً."); }
+            })
+            .catch(function () { send.disabled = false; send.textContent = "Upload photo | تحميل الصورة"; out.innerHTML = msg("err", "Check your internet and tap Upload again.", "تحقق من الإنترنت واضغط تحميل مجدداً."); });
+        };
+      })
+      .catch(function () { app.innerHTML = '<div class="body" style="padding-top:40px">' + msg("err", "Check your internet and try again.", "تحقق من الإنترنت وحاول مجدداً.") + "</div>"; });
+  }
+
+  if (/^[a-z0-9]{6}$/.test(CARD) && /^[a-f0-9]{10}$/.test(KEY)) loadPhotoPage();
+  else if (/^[a-z0-9]{6}$/.test(CARD)) loadProfile();
+  else app.innerHTML = '<div class="head"><div class="brand">ADLINKCARD</div><div style="opacity:.85;margin-top:4px">Smart Business Card · Grow Smarter</div></div><div class="body">' +
+         msg("", "Scan a Smart Business Card to see its profile.", "امسح بطاقة الأعمال الذكية لعرض صفحتها.") + FOOT + "</div>";
+</script>
+</body>
+</html>
