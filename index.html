@@ -7,7 +7,7 @@
 <title>Smart Business Card · ADLINKCARD</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💼</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Amiri:wght@700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <style>
   /* =========================================================
@@ -111,6 +111,18 @@
   .share2 .hint { font-size:12px; opacity:.8; margin-top:12px; }
   .share2 .lux { margin-top:12px; background:rgba(255,255,255,.14); color:var(--onMain); border:1px solid rgba(255,255,255,.35); font-size:14px; }
   .foot2 { text-align:center; font-size:10.5px; letter-spacing:1.5px; color:var(--ink); opacity:.45; padding:18px 0 22px; }
+
+  /* ---------- language switch + Arabic ---------- */
+  .lang { position:absolute; top:calc(14px + env(safe-area-inset-top,0px)); inset-inline-end:14px; z-index:2; display:flex;
+          border-radius:20px; overflow:hidden; border:1px solid rgba(255,255,255,.45); background:rgba(0,0,0,.18); }
+  .lang button { border:0; background:transparent; color:inherit; font:inherit; font-size:12px; padding:4px 11px; cursor:pointer; opacity:.7; }
+  .lang button.on { background:rgba(255,255,255,.9); color:#1A1A1A; opacity:1; font-weight:700; }
+  html[dir=rtl] body { font-family:"Cairo",system-ui,Tahoma,sans-serif; }
+  html[dir=rtl] .nm { font-family:"Amiri","Cairo",serif; font-weight:700; }
+  html[dir=rtl] .tt, html[dir=rtl] .num small, html[dir=rtl] .share2 .h, html[dir=rtl] .lux { letter-spacing:0; }
+  .num .ch { margin-left:0; margin-inline-start:auto; }
+  .wallet2 .tx { text-align:start; }
+  .flag { font-size:13px; }
 </style>
 </head>
 <body>
@@ -167,6 +179,25 @@
   }
   function msg(cls, en, ar) { return '<div class="msg ' + (cls || "") + '">' + en + '<div class="ar">' + ar + "</div></div>"; }
   var FOOT = '<div class="foot">Powered by <b>ADLINKCARD</b> · Grow Smarter</div>';
+
+  /* ---------- languages (the client's language opens first; the visitor can switch) ---------- */
+  var T = {
+    en: { mobile: "Mobile", mobile2: "Mobile 2", office: "Office", wa: "WhatsApp", mail: "Email", web: "Website", pin: "Location",
+          ig: "Instagram", fb: "Facebook", li: "LinkedIn", tt: "TikTok", save: "SAVE CONTACT", wallet: "Add to Wallet",
+          walletSub: "APPLE · GOOGLE", huawei: "Huawei", share: "Share my card", hint: "Show this to a friend to scan",
+          send: "Send my card link", copied: "Link copied ✓" },
+    ar: { mobile: "موبايل", mobile2: "موبايل 2", office: "المكتب", wa: "واتساب", mail: "البريد", web: "الموقع", pin: "العنوان",
+          ig: "إنستغرام", fb: "فيسبوك", li: "لينكدإن", tt: "تيك توك", save: "حفظ جهة الاتصال", wallet: "أضف إلى المحفظة",
+          walletSub: "APPLE · GOOGLE", huawei: "هواوي", share: "شارك بطاقتي", hint: "اعرض الرمز على صديقك ليمسحه",
+          send: "أرسل رابط بطاقتي", copied: "تم نسخ الرابط ✓" }
+  };
+  var LANG = "en";
+
+  // Country from the calling code (longest match): 96171... -> LB, 1555... -> US
+  var CC = {};
+  "1US 7RU 20EG 27ZA 30GR 31NL 32BE 33FR 34ES 36HU 39IT 40RO 41CH 43AT 44GB 45DK 46SE 47NO 48PL 49DE 51PE 52MX 53CU 54AR 55BR 56CL 57CO 58VE 60MY 61AU 62ID 63PH 64NZ 65SG 66TH 81JP 82KR 84VN 86CN 90TR 91IN 92PK 93AF 94LK 95MM 98IR 211SS 212MA 213DZ 216TN 218LY 220GM 221SN 222MR 223ML 224GN 225CI 226BF 227NE 228TG 229BJ 230MU 231LR 232SL 233GH 234NG 235TD 236CF 237CM 238CV 239ST 240GQ 241GA 242CG 243CD 244AO 245GW 248SC 249SD 250RW 251ET 252SO 253DJ 254KE 255TZ 256UG 257BI 258MZ 260ZM 261MG 262RE 263ZW 264NA 265MW 266LS 267BW 268SZ 269KM 291ER 297AW 298FO 299GL 350GI 351PT 352LU 353IE 354IS 355AL 356MT 357CY 358FI 359BG 370LT 371LV 372EE 373MD 374AM 375BY 376AD 377MC 378SM 380UA 381RS 382ME 383XK 385HR 386SI 387BA 389MK 420CZ 421SK 423LI 501BZ 502GT 503SV 504HN 505NI 506CR 507PA 509HT 591BO 592GY 593EC 595PY 597SR 598UY 673BN 675PG 679FJ 852HK 853MO 855KH 856LA 880BD 886TW 960MV 961LB 962JO 963SY 964IQ 965KW 966SA 967YE 968OM 970PS 971AE 972IL 973BH 974QA 975BT 976MN 977NP 992TJ 993TM 994AZ 995GE 996KG 998UZ".split(" ").forEach(function (t) { var m = t.match(/^(\d+)([A-Z]{2})$/); if (m) CC[m[1]] = m[2]; });
+  function country(n) { n = String(n || ""); for (var L = 3; L >= 1; L--) if (CC[n.substr(0, L)]) return CC[n.substr(0, L)]; return ""; }
+  function flag(c) { return c ? String.fromCodePoint(0x1F1E6 + c.charCodeAt(0) - 65, 0x1F1E6 + c.charCodeAt(1) - 65) : ""; }
 
   /* ---------- styled QR (same look as the printed card) ---------- */
   function drawQR(canvas, text, d) {
@@ -240,40 +271,49 @@
 
   /* ---------- profile ---------- */
   function renderProfile(d) {
+    var saved = null;
+    try { saved = localStorage.getItem("sbc_lang_" + CARD); } catch (e) {}
+    LANG = saved || (d.lang === "AR" ? "ar" : "en");
+    var t = T[LANG];
+    document.documentElement.lang = LANG;
+    document.documentElement.dir = LANG === "ar" ? "rtl" : "ltr";
     setColors(d.colors);
     document.title = d.name + " · Smart Business Card";
     var m = d.colors.main, a = d.colors.accent, bg = d.colors.bg;
     var tt = lum(a) < 200 ? a : m;
     function num(label, n) {
+      var c = country(n);
       return '<a class="num" href="tel:+' + n + '"><div class="ic" style="background:' + grad(m, .15, -.1) + '">' + svg("call") +
-             "</div><div><small>" + label + "</small><b>" + esc(showPhone(n)) + '</b></div><div class="ch">›</div></a>';
+             "</div><div><small>" + (c ? '<span class="flag">' + flag(c) + "</span> " + c + " · " : "") + label + "</small>" +
+             '<b><bdi dir="ltr">' + esc(showPhone(n)) + '</bdi></b></div><div class="ch">' + (LANG === "ar" ? "‹" : "›") + "</div></a>";
     }
     function item(k, label, href) {
       return '<a class="it" href="' + esc(href) + '"' + (/^https?:/.test(href) ? ' target="_blank" rel="noopener"' : "") + '>' +
              '<div class="ci" style="background:' + grad(m, .18, -.3) + ";border:2px solid " + a + '">' + svg(k) + "</div><span>" + label + "</span></a>";
     }
     var nums = "";
-    if (d.mobile) nums += num("Mobile", d.mobile);
-    if (d.mobile2) nums += num("Mobile 2", d.mobile2);
-    if (d.office) nums += num("Office", d.office);
+    if (d.mobile) nums += num(t.mobile, d.mobile);
+    if (d.mobile2) nums += num(t.mobile2, d.mobile2);
+    if (d.office) nums += num(t.office, d.office);
     var g = [];
-    if (d.mobile) g.push(item("wa", "WhatsApp", "https://wa.me/" + d.mobile));
-    if (d.email) g.push(item("mail", "Email", "mailto:" + d.email));
-    if (d.website) g.push(item("web", "Website", http(d.website)));
-    if (d.location) g.push(item("pin", "Location", http(d.location)));
-    if (d.instagram) g.push(item("ig", "Instagram", social(d.instagram, "https://instagram.com/")));
-    if (d.facebook) g.push(item("fb", "Facebook", social(d.facebook, "https://facebook.com/")));
-    if (d.linkedin) g.push(item("li", "LinkedIn", social(d.linkedin, "https://linkedin.com/in/")));
-    if (d.tiktok) g.push(item("tt", "TikTok", social(d.tiktok, "https://tiktok.com/@")));
+    if (d.mobile) g.push(item("wa", t.wa, "https://wa.me/" + d.mobile));
+    if (d.email) g.push(item("mail", t.mail, "mailto:" + d.email));
+    if (d.website) g.push(item("web", t.web, http(d.website)));
+    if (d.location) g.push(item("pin", t.pin, http(d.location)));
+    if (d.instagram) g.push(item("ig", t.ig, social(d.instagram, "https://instagram.com/")));
+    if (d.facebook) g.push(item("fb", t.fb, social(d.facebook, "https://facebook.com/")));
+    if (d.linkedin) g.push(item("li", t.li, social(d.linkedin, "https://linkedin.com/in/")));
+    if (d.tiktok) g.push(item("tt", t.tt, social(d.tiktok, "https://tiktok.com/@")));
     var wallet = "";
     if (d.pass) {
       wallet = '<div class="wrow"><a class="lux wallet2" href="' + esc(d.pass) + '" target="_blank" rel="noopener">' + svg("wallet") +
-               '<div class="tx">Add to Wallet<small>APPLE · GOOGLE</small></div></a>' +
-               (d.huawei ? '<a class="lux hw" href="' + esc(d.huawei) + '">' + svg("phone") + "Huawei</a>" : "") + "</div>";
+               '<div class="tx">' + t.wallet + '<small>' + t.walletSub + '</small></div></a>' +
+               (d.huawei ? '<a class="lux hw" href="' + esc(d.huawei) + '">' + svg("phone") + t.huawei + "</a>" : "") + "</div>";
     }
     app.innerHTML =
       '<div class="hero" style="background:linear-gradient(140deg,' + shade(m, .12) + " 0%," + m + " 45%," + shade(m, -.35) + ' 100%)">' +
         '<div class="lines"></div><div class="glow" style="background:radial-gradient(circle,' + a + ' 0%,transparent 65%)"></div>' +
+        '<div class="lang"><button data-l="en"' + (LANG === "en" ? ' class="on"' : "") + '>EN</button><button data-l="ar"' + (LANG === "ar" ? ' class="on"' : "") + '>ع</button></div>' +
         // top: the logo on a white pill (readable for any logo colors). When the logo is already in the
         // circle (no photo), the top shows the company name instead, so the logo is not shown twice.
         '<div class="logo">' + (d.logo && d.photo ? '<span class="pill"><img alt="' + esc(d.company || "Logo") + '" src="' + d.logo + '"></span>'
@@ -295,17 +335,23 @@
       nums +
       (g.length ? '<div class="grid">' + g.join("") + "</div>" : "") +
       '<div class="acts"><button class="lux" id="save" style="background:linear-gradient(140deg,' + shade(m, .1) + "," + shade(m, -.25) + ");color:" + on(m) +
-        ";border:1.5px solid " + a + '">' + svg("save") + "SAVE CONTACT</button>" + wallet + "</div>" +
-      '<div class="share2" style="background:linear-gradient(140deg,' + shade(m, .1) + "," + shade(m, -.3) + ')"><div class="h">Share my card</div>' +
+        ";border:1.5px solid " + a + '">' + svg("save") + t.save + "</button>" + wallet + "</div>" +
+      '<div class="share2" style="background:linear-gradient(140deg,' + shade(m, .1) + "," + shade(m, -.3) + ')"><div class="h">' + t.share + '</div>' +
         '<div class="tile"><canvas id="qr" aria-label="QR code of this card"></canvas></div>' +
-        '<div class="hint">Show this to a friend to scan</div>' +
-        '<button class="lux" id="shareBtn">' + svg("share") + "Send my card link</button></div>" +
+        '<div class="hint">' + t.hint + '</div>' +
+        '<button class="lux" id="shareBtn">' + svg("share") + t.send + "</button></div>" +
       '<div class="foot2">POWERED BY ADLINKCARD · GROW SMARTER</div>';
     document.getElementById("save").onclick = function () { saveContact(d); };
+    Array.prototype.forEach.call(document.querySelectorAll(".lang button"), function (btn) {
+      btn.onclick = function () {
+        try { localStorage.setItem("sbc_lang_" + CARD, btn.getAttribute("data-l")); } catch (e) {}
+        renderProfile(d);
+      };
+    });
     document.getElementById("shareBtn").onclick = function () {
-      var t = this;
+      var b = this;
       if (navigator.share) { navigator.share({ title: d.name, url: d.link }).catch(function () {}); return; }
-      navigator.clipboard.writeText(d.link).then(function () { t.lastChild.textContent = "Link copied ✓"; }).catch(function () { prompt("Copy this link:", d.link); });
+      navigator.clipboard.writeText(d.link).then(function () { b.lastChild.textContent = T[LANG].copied; }).catch(function () { prompt("Copy this link:", d.link); });
     };
     if (window.qrcode) drawQR(document.getElementById("qr"), d.link, d);
   }
