@@ -6,6 +6,8 @@
 <meta name="theme-color" content="#1E2761">
 <title>Smart Business Card · ADLINKCARD</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💼</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <style>
   /* =========================================================
@@ -60,6 +62,53 @@
   .btn:disabled { opacity:.45; cursor:default; }
   .ok { background:#E5F4EC; color:#1E7B4F; } .err { background:#FBE9E7; color:#B3261E; }
   input[type=file] { display:none; }
+
+  /* ---------- luxury profile ---------- */
+  .hero { position:relative; height:225px; overflow:hidden; color:var(--onMain);
+          padding-top:env(safe-area-inset-top,0px); }
+  .hero .lines { position:absolute; inset:0; background:repeating-linear-gradient(135deg,rgba(255,255,255,.05) 0 1px,transparent 1px 14px); }
+  .hero .glow { position:absolute; width:300px; height:300px; border-radius:50%; right:-90px; top:-130px; opacity:.35; }
+  .hero .logo { position:relative; text-align:center; padding-top:26px; }
+  .hero .logo img { max-height:58px; max-width:210px; object-fit:contain; }
+  .hero .logo .brand { font-size:14px; letter-spacing:4px; font-weight:600; }
+  .hero svg.wave { position:absolute; left:0; right:0; bottom:-1px; width:100%; height:62px; }
+  .ring { width:126px; height:126px; border-radius:50%; margin:-96px auto 0; position:relative; overflow:hidden;
+          display:flex; align-items:center; justify-content:center; font-family:"Playfair Display",Georgia,serif; font-size:42px; }
+  .ring img { width:100%; height:100%; object-fit:cover; display:block; }
+  .nm { text-align:center; font-family:"Playfair Display",Georgia,"Times New Roman",serif; font-weight:600; font-size:29px;
+        margin:16px 18px 0; line-height:1.2; color:var(--ink); }
+  .tt { text-align:center; font-size:12px; letter-spacing:2.5px; text-transform:uppercase; margin-top:7px; font-weight:600; }
+  .co { text-align:center; font-size:13px; margin-top:3px; color:var(--soft); }
+  .divd { display:flex; align-items:center; gap:10px; margin:18px 48px; }
+  .divd i { flex:1; height:1px; } .divd b { width:7px; height:7px; transform:rotate(45deg); }
+  .num { display:flex; align-items:center; gap:13px; margin:0 18px 10px; padding:12px 15px; border-radius:16px; background:#fff;
+         box-shadow:0 4px 14px rgba(0,0,0,.08); text-decoration:none; }
+  .num .ic { width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex:none; }
+  .num .ic svg { width:19px; height:19px; fill:#fff; }
+  .num small { display:block; font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:#8A8F99; }
+  .num b { font-size:17px; color:#1A1A1A; font-weight:600; letter-spacing:.4px; }
+  .num .ch { margin-left:auto; color:#B0B4BC; font-size:22px; }
+  .grid { display:flex; flex-wrap:wrap; justify-content:center; row-gap:16px; margin:20px 12px 4px; }
+  .it { width:25%; text-align:center; text-decoration:none; }
+  .ci { width:56px; height:56px; border-radius:50%; margin:0 auto 7px; display:flex; align-items:center; justify-content:center;
+        box-shadow:0 6px 14px rgba(0,0,0,.18); }
+  .ci svg { width:24px; height:24px; fill:#fff; }
+  .it span { font-size:11px; color:var(--ink); opacity:.78; }
+  .lux { display:flex; align-items:center; justify-content:center; gap:10px; border-radius:14px; padding:14px; font:inherit;
+         font-size:15px; font-weight:600; letter-spacing:1px; border:0; width:100%; cursor:pointer; text-decoration:none; }
+  .lux svg { width:19px; height:19px; fill:currentColor; flex:none; }
+  .acts { margin:18px 18px 0; display:grid; gap:10px; }
+  .wrow { display:grid; grid-template-columns:1fr auto; gap:10px; }
+  .wallet2 { background:#000; color:#fff; letter-spacing:.3px; }
+  .wallet2 small { display:block; font-size:10.5px; font-weight:400; opacity:.7; letter-spacing:1px; margin-top:1px; }
+  .wallet2 .tx { text-align:left; line-height:1.15; }
+  .hw { background:#fff; color:#1A1A1A; border:1.5px solid #1A1A1A; padding:14px 16px; font-size:13px; letter-spacing:.3px; }
+  .share2 { margin:16px 18px 0; border-radius:20px; padding:18px 14px 16px; text-align:center; color:var(--onMain); }
+  .share2 .h { font-size:12px; letter-spacing:2.5px; text-transform:uppercase; font-weight:600; }
+  .share2 .tile { margin-top:12px; }
+  .share2 .hint { font-size:12px; opacity:.8; margin-top:12px; }
+  .share2 .lux { margin-top:12px; background:rgba(255,255,255,.14); color:var(--onMain); border:1px solid rgba(255,255,255,.35); font-size:14px; }
+  .foot2 { text-align:center; font-size:10.5px; letter-spacing:1.5px; color:var(--ink); opacity:.45; padding:18px 0 22px; }
 </style>
 </head>
 <body>
@@ -87,12 +136,19 @@
     pin: '<path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/>',
     save: '<path d="M19 3H5a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm-7 3a3 3 0 1 1 0 6 3 3 0 0 1 0-6zm6 12H6v-1c0-2 4-3.1 6-3.1s6 1.1 6 3.1z"/>',
     wallet: '<path d="M21 7H5a1 1 0 0 1 0-2h14V3H5a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h16a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1zm-3 8a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>',
+    phone: '<path d="M17 1H7a2 2 0 0 0-2 2v18c0 1.1.9 2 2 2h10a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2zm-5 21a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5-4H7V4h10z"/>',
     share: '<path d="M18 16a3 3 0 0 0-2.4 1.2l-6.7-3.4a3 3 0 0 0 0-1.6l6.7-3.4A3 3 0 1 0 15 7l-6.7 3.4a3 3 0 1 0 0 3.2L15 17a3 3 0 1 0 3-1z"/>'
   };
   function svg(k) { return '<svg viewBox="0 0 24 24" aria-hidden="true">' + ICON[k] + '</svg>'; }
   function esc(s) { return String(s || "").replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function lum(h) { h = h.replace("#", ""); return 0.299 * parseInt(h.substr(0, 2), 16) + 0.587 * parseInt(h.substr(2, 2), 16) + 0.114 * parseInt(h.substr(4, 2), 16); }
   function on(h) { return lum(h) > 160 ? "#1A1A1A" : "#FFFFFF"; }
+  function shade(h, f) {             // f > 0 lighter, f < 0 darker
+    h = h.replace("#", "");
+    return "rgb(" + [0, 2, 4].map(function (i) { var x = parseInt(h.substr(i, 2), 16);
+      return Math.max(0, Math.min(255, Math.round(f < 0 ? x * (1 + f) : x + (255 - x) * f))); }).join(",") + ")";
+  }
+  function grad(h, a, b) { return "linear-gradient(140deg," + shade(h, a) + " 0%," + h + " 55%," + shade(h, b) + " 100%)"; }
   function setColors(c) {
     var r = document.documentElement.style;
     r.setProperty("--main", c.main); r.setProperty("--accent", c.accent); r.setProperty("--bg", c.bg);
@@ -184,35 +240,59 @@
   function renderProfile(d) {
     setColors(d.colors);
     document.title = d.name + " · Smart Business Card";
-    var b = [];
-    if (d.mobile) b.push('<a class="btn" href="tel:+' + d.mobile + '">' + svg("call") + "Call</a>");
-    if (d.mobile) b.push('<a class="btn" href="https://wa.me/' + d.mobile + '" target="_blank" rel="noopener">' + svg("wa") + "WhatsApp</a>");
-    if (d.mobile2) b.push('<a class="btn" href="tel:+' + d.mobile2 + '">' + svg("call") + "Call (mobile 2)</a>");
-    if (d.office) b.push('<a class="btn" href="tel:+' + d.office + '">' + svg("call") + "Office</a>");
-    if (d.email) b.push('<a class="btn" href="mailto:' + esc(d.email) + '">' + svg("mail") + "Email</a>");
-    if (d.website) b.push('<a class="btn" href="' + esc(http(d.website)) + '" target="_blank" rel="noopener">' + svg("web") + "Website</a>");
-    if (d.instagram) b.push('<a class="btn" href="' + esc(social(d.instagram, "https://instagram.com/")) + '" target="_blank" rel="noopener">' + svg("ig") + "Instagram</a>");
-    if (d.facebook) b.push('<a class="btn" href="' + esc(social(d.facebook, "https://facebook.com/")) + '" target="_blank" rel="noopener">' + svg("fb") + "Facebook</a>");
-    if (d.linkedin) b.push('<a class="btn" href="' + esc(social(d.linkedin, "https://linkedin.com/in/")) + '" target="_blank" rel="noopener">' + svg("li") + "LinkedIn</a>");
-    if (d.tiktok) b.push('<a class="btn" href="' + esc(social(d.tiktok, "https://tiktok.com/@")) + '" target="_blank" rel="noopener">' + svg("tt") + "TikTok</a>");
-    if (d.location) b.push('<a class="btn" href="' + esc(http(d.location)) + '" target="_blank" rel="noopener">' + svg("pin") + "Find us</a>");
-    var sub = [d.job, d.company].filter(function (x) { return x; }).map(esc).join(" · ");
+    var m = d.colors.main, a = d.colors.accent, bg = d.colors.bg;
+    var tt = lum(a) < 200 ? a : m;
+    function num(label, n) {
+      return '<a class="num" href="tel:+' + n + '"><div class="ic" style="background:' + grad(m, .15, -.1) + '">' + svg("call") +
+             "</div><div><small>" + label + "</small><b>" + esc(showPhone(n)) + '</b></div><div class="ch">›</div></a>';
+    }
+    function item(k, label, href) {
+      return '<a class="it" href="' + esc(href) + '"' + (/^https?:/.test(href) ? ' target="_blank" rel="noopener"' : "") + '>' +
+             '<div class="ci" style="background:' + grad(m, .18, -.3) + ";border:2px solid " + a + '">' + svg(k) + "</div><span>" + label + "</span></a>";
+    }
+    var nums = "";
+    if (d.mobile) nums += num("Mobile", d.mobile);
+    if (d.mobile2) nums += num("Mobile 2", d.mobile2);
+    if (d.office) nums += num("Office", d.office);
+    var g = [];
+    if (d.mobile) g.push(item("wa", "WhatsApp", "https://wa.me/" + d.mobile));
+    if (d.email) g.push(item("mail", "Email", "mailto:" + d.email));
+    if (d.website) g.push(item("web", "Website", http(d.website)));
+    if (d.location) g.push(item("pin", "Location", http(d.location)));
+    if (d.instagram) g.push(item("ig", "Instagram", social(d.instagram, "https://instagram.com/")));
+    if (d.facebook) g.push(item("fb", "Facebook", social(d.facebook, "https://facebook.com/")));
+    if (d.linkedin) g.push(item("li", "LinkedIn", social(d.linkedin, "https://linkedin.com/in/")));
+    if (d.tiktok) g.push(item("tt", "TikTok", social(d.tiktok, "https://tiktok.com/@")));
+    var wallet = "";
+    if (d.pass) {
+      wallet = '<div class="wrow"><a class="lux wallet2" href="' + esc(d.pass) + '" target="_blank" rel="noopener">' + svg("wallet") +
+               '<div class="tx">Add to Wallet<small>APPLE · GOOGLE</small></div></a>' +
+               (d.huawei ? '<a class="lux hw" href="' + esc(d.huawei) + '">' + svg("phone") + "Huawei</a>" : "") + "</div>";
+    }
     app.innerHTML =
-      '<div class="head">' + (d.logo ? '<img alt="' + esc(d.company || "Logo") + '" src="' + d.logo + '">' : '<div class="brand">' + esc((d.company || "ADLINKCARD").toUpperCase()) + "</div>") + "</div>" +
-      '<div class="body">' +
-        '<div class="photo">' + (d.photo ? '<img alt="' + esc(d.name) + '" src="' + d.photo + '">' : esc(initials(d.name))) + "</div>" +
-        '<h1 dir="auto">' + esc(d.name) + "</h1>" +
-        '<div class="sub" dir="auto">' + sub + "</div>" +
-        b.join("") +
-        '<button class="btn main" id="save">' + svg("save") + "Save contact</button>" +
-        (d.pass ? '<a class="btn wallet" href="' + esc(d.pass) + '" target="_blank" rel="noopener">' + svg("wallet") + "Add to Wallet</a>" +
-                  (d.huawei ? '<a class="small" href="' + esc(d.huawei) + '">Huawei phone? Get the pass here</a>' : "") : "") +
-        '<div class="share"><b>' + svg("share").replace("<svg", '<svg style="width:16px;height:16px;vertical-align:-3px;fill:currentColor"') + " Share my card</b>" +
-          '<div class="tile"><canvas id="qr" aria-label="QR code of this card"></canvas></div>' +
-          '<div class="hint">Show this to a friend to scan</div>' +
-          '<button class="btn" id="shareBtn">' + svg("share") + "Send my card link</button>" +
-        "</div>" + FOOT +
-      "</div>";
+      '<div class="hero" style="background:linear-gradient(140deg,' + shade(m, .12) + " 0%," + m + " 45%," + shade(m, -.35) + ' 100%)">' +
+        '<div class="lines"></div><div class="glow" style="background:radial-gradient(circle,' + a + ' 0%,transparent 65%)"></div>' +
+        '<div class="logo">' + (d.logo ? '<img alt="' + esc(d.company || "Logo") + '" src="' + d.logo + '">'
+                                       : '<div class="brand">' + esc((d.company || "ADLINKCARD").toUpperCase()) + "</div>") + "</div>" +
+        '<svg class="wave" viewBox="0 0 330 62" preserveAspectRatio="none"><path d="M0 34 C 90 70, 240 0, 330 30 L330 62 L0 62 Z" fill="' + bg + '"/>' +
+        '<path d="M0 40 C 100 72, 230 8, 330 38" fill="none" stroke="' + a + '" stroke-width="2"/></svg>' +
+      "</div>" +
+      '<div class="ring" style="background:' + grad(m, .15, -.2) + ";color:" + on(m) + ";box-shadow:0 0 0 4px " + bg + ",0 0 0 7px " + a + ',0 10px 24px rgba(0,0,0,.28)">' +
+        (d.photo ? '<img alt="' + esc(d.name) + '" src="' + d.photo + '">' : esc(initials(d.name))) + "</div>" +
+      '<div class="nm" dir="auto">' + esc(d.name) + "</div>" +
+      (d.job ? '<div class="tt" dir="auto" style="color:' + tt + '">' + esc(d.job) + "</div>" : "") +
+      (d.company ? '<div class="co" dir="auto">' + esc(d.company) + "</div>" : "") +
+      '<div class="divd"><i style="background:linear-gradient(90deg,transparent,' + a + ')"></i><b style="background:' + a + '"></b>' +
+        '<i style="background:linear-gradient(90deg,' + a + ',transparent)"></i></div>' +
+      nums +
+      (g.length ? '<div class="grid">' + g.join("") + "</div>" : "") +
+      '<div class="acts"><button class="lux" id="save" style="background:linear-gradient(140deg,' + shade(m, .1) + "," + shade(m, -.25) + ");color:" + on(m) +
+        ";border:1.5px solid " + a + '">' + svg("save") + "SAVE CONTACT</button>" + wallet + "</div>" +
+      '<div class="share2" style="background:linear-gradient(140deg,' + shade(m, .1) + "," + shade(m, -.3) + ')"><div class="h">Share my card</div>' +
+        '<div class="tile"><canvas id="qr" aria-label="QR code of this card"></canvas></div>' +
+        '<div class="hint">Show this to a friend to scan</div>' +
+        '<button class="lux" id="shareBtn">' + svg("share") + "Send my card link</button></div>" +
+      '<div class="foot2">POWERED BY ADLINKCARD · GROW SMARTER</div>';
     document.getElementById("save").onclick = function () { saveContact(d); };
     document.getElementById("shareBtn").onclick = function () {
       var t = this;
@@ -220,6 +300,13 @@
       navigator.clipboard.writeText(d.link).then(function () { t.lastChild.textContent = "Link copied ✓"; }).catch(function () { prompt("Copy this link:", d.link); });
     };
     if (window.qrcode) drawQR(document.getElementById("qr"), d.link, d);
+  }
+
+  function showPhone(n) {             // 96170123456 -> +961 70 123 456
+    n = String(n || "").replace(/\D/g, "");
+    if (/^961\d{8}$/.test(n)) return "+961 " + n.substr(3, 2) + " " + n.substr(5, 3) + " " + n.substr(8, 3);
+    if (/^961\d{7}$/.test(n)) return "+961 " + n.substr(3, 1) + " " + n.substr(4, 3) + " " + n.substr(7, 3);
+    return "+" + n;
   }
 
   function loadProfile() {
