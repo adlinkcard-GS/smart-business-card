@@ -226,7 +226,7 @@
     var cached = null;
     try { cached = JSON.parse(localStorage.getItem("sbc_" + CARD) || "null"); } catch (e) {}
     if (cached && cached.ok) renderProfile(cached);
-    fetch(API + "?api=profile&c=" + encodeURIComponent(CARD))
+    fetch(API + "?api=profile&card=" + encodeURIComponent(CARD))
       .then(function (r) { return r.json(); })
       .then(function (d) {
         if (d.ok) {
@@ -248,7 +248,7 @@
 
   /* ---------- photo upload (?c=...&k=...) ---------- */
   function loadPhotoPage() {
-    fetch(API + "?api=check&c=" + encodeURIComponent(CARD) + "&k=" + encodeURIComponent(KEY))
+    fetch(API + "?api=check&card=" + encodeURIComponent(CARD) + "&k=" + encodeURIComponent(KEY))
       .then(function (r) { return r.json(); })
       .then(function (s) {
         if (!s.ok) { app.innerHTML = '<div class="body" style="padding-top:40px">' + msg("err", "This link is not valid.", "هذا الرابط غير صالح.") + FOOT + "</div>"; return; }
@@ -281,7 +281,7 @@
         send.onclick = function () {
           if (!jpeg) return;
           send.disabled = true; send.textContent = "Uploading… | جارٍ التحميل…";
-          fetch(API, { method: "POST", body: JSON.stringify({ action: "photo", c: CARD, k: KEY, img: jpeg }) })
+          fetch(API, { method: "POST", body: JSON.stringify({ action: "photo", card: CARD, k: KEY, img: jpeg }) })
             .then(function (r) { return r.json(); })
             .then(function (r) {
               send.textContent = "Upload photo | تحميل الصورة";
