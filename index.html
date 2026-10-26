@@ -69,7 +69,9 @@
   .hero .lines { position:absolute; inset:0; background:repeating-linear-gradient(135deg,rgba(255,255,255,.05) 0 1px,transparent 1px 14px); }
   .hero .glow { position:absolute; width:300px; height:300px; border-radius:50%; right:-90px; top:-130px; opacity:.35; }
   .hero .logo { position:relative; text-align:center; padding-top:26px; }
-  .hero .logo img { max-height:58px; max-width:210px; object-fit:contain; }
+  .hero .logo .pill { display:inline-flex; align-items:center; justify-content:center; background:rgba(255,255,255,.96);
+                      border-radius:14px; padding:8px 16px; box-shadow:0 6px 18px rgba(0,0,0,.25); }
+  .hero .logo img { max-height:44px; max-width:180px; object-fit:contain; display:block; }
   .hero .logo .brand { font-size:14px; letter-spacing:4px; font-weight:600; }
   .hero svg.wave { position:absolute; left:0; right:0; bottom:-1px; width:100%; height:62px; }
   .ring { width:126px; height:126px; border-radius:50%; margin:-96px auto 0; position:relative; overflow:hidden;
@@ -272,13 +274,19 @@
     app.innerHTML =
       '<div class="hero" style="background:linear-gradient(140deg,' + shade(m, .12) + " 0%," + m + " 45%," + shade(m, -.35) + ' 100%)">' +
         '<div class="lines"></div><div class="glow" style="background:radial-gradient(circle,' + a + ' 0%,transparent 65%)"></div>' +
-        '<div class="logo">' + (d.logo ? '<img alt="' + esc(d.company || "Logo") + '" src="' + d.logo + '">'
+        // top: the logo on a white pill (readable for any logo colors). When the logo is already in the
+        // circle (no photo), the top shows the company name instead, so the logo is not shown twice.
+        '<div class="logo">' + (d.logo && d.photo ? '<span class="pill"><img alt="' + esc(d.company || "Logo") + '" src="' + d.logo + '"></span>'
                                        : '<div class="brand">' + esc((d.company || "ADLINKCARD").toUpperCase()) + "</div>") + "</div>" +
         '<svg class="wave" viewBox="0 0 330 62" preserveAspectRatio="none"><path d="M0 34 C 90 70, 240 0, 330 30 L330 62 L0 62 Z" fill="' + bg + '"/>' +
         '<path d="M0 40 C 100 72, 230 8, 330 38" fill="none" stroke="' + a + '" stroke-width="2"/></svg>' +
       "</div>" +
-      '<div class="ring" style="background:' + grad(m, .15, -.2) + ";color:" + on(m) + ";box-shadow:0 0 0 4px " + bg + ",0 0 0 7px " + a + ',0 10px 24px rgba(0,0,0,.28)">' +
-        (d.photo ? '<img alt="' + esc(d.name) + '" src="' + d.photo + '">' : esc(initials(d.name))) + "</div>" +
+      // circle: the photo; no photo -> the client's logo on white; no logo either -> initials
+      '<div class="ring" style="background:' + (!d.photo && d.logo ? "#fff" : grad(m, .15, -.2)) + ";color:" + on(m) +
+        ";box-shadow:0 0 0 4px " + bg + ",0 0 0 7px " + a + ',0 10px 24px rgba(0,0,0,.28)">' +
+        (d.photo ? '<img alt="' + esc(d.name) + '" src="' + d.photo + '">'
+                 : d.logo ? '<img alt="' + esc(d.company || "Logo") + '" src="' + d.logo + '" style="object-fit:contain;padding:18px;box-sizing:border-box">'
+                 : esc(initials(d.name))) + "</div>" +
       '<div class="nm" dir="auto">' + esc(d.name) + "</div>" +
       (d.job ? '<div class="tt" dir="auto" style="color:' + tt + '">' + esc(d.job) + "</div>" : "") +
       (d.company ? '<div class="co" dir="auto">' + esc(d.company) + "</div>" : "") +
