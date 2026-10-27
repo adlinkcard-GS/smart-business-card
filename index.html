@@ -336,8 +336,9 @@
         '<i style="background:linear-gradient(90deg,' + a + ',transparent)"></i></div>' +
       nums +
       (g.length ? '<div class="grid">' + g.join("") + "</div>" : "") +
+      // (the wallet pass belongs to the card holder: it is sent to them by WhatsApp, not shown to visitors)
       '<div class="acts"><button class="lux" id="save" style="background:linear-gradient(140deg,' + shade(m, .1) + "," + shade(m, -.25) + ");color:" + on(m) +
-        ";border:1.5px solid " + a + '">' + svg("save") + t.save + "</button>" + wallet + "</div>" +
+        ";border:1.5px solid " + a + '">' + svg("save") + t.save + "</button></div>" +
       '<div class="share2" style="background:linear-gradient(140deg,' + shade(m, .1) + "," + shade(m, -.3) + ')"><div class="h">' + t.share + '</div>' +
         '<div class="tile"><canvas id="qr" aria-label="QR code of this card"></canvas></div>' +
         '<div class="hint">' + t.hint + '</div>' +
