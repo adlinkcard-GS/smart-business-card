@@ -321,9 +321,9 @@
     if (COVER && el) { el.style.backgroundImage = "url(" + COVER + ")"; el.className = "cov on"; }
   }
   function loadCover(d) {
-    if (!d.hasCover || !d.code) return;
+    if (!d.hasCover || !(d.coverId || d.code)) return;
     if (COVER) { showCover(); return; }
-    fetch(API + "?api=cover&code=" + encodeURIComponent(d.code)).then(function (r) { return r.json(); }).then(function (r) {
+    fetch(API + "?api=cover&code=" + encodeURIComponent(d.coverId || d.code)).then(function (r) { return r.json(); }).then(function (r) {
       if (r.img) { COVER = r.img; showCover(); }
     }).catch(function () {});
   }
@@ -445,10 +445,11 @@
       });
   }
 
-  /* ---------- the client's logo & cover upload page (?b=CODE&k=key) ---------- */
+  /* ---------- logo & cover upload page: a company (?b=CODE&k=key) or one person (?c=card&k=key) ---------- */
   var BCODE = (Q.get("b") || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+  function brandWho() { return BCODE ? "code=" + encodeURIComponent(BCODE) : "card=" + encodeURIComponent(CARD); }
   function loadBrandPage() {
-    fetch(API + "?api=brand&code=" + encodeURIComponent(BCODE) + "&k=" + encodeURIComponent(KEY))
+    fetch(API + "?api=brand&" + brandWho() + "&k=" + encodeURIComponent(KEY))
       .then(function (r) { return r.json(); })
       .then(function (s) {
         if (!s.ok) { app.innerHTML = '<div class="body" style="padding-top:40px">' + msg("err", "This link is not valid.", "هذا الرابط غير صالح.") + FOOT + "</div>"; return; }
@@ -458,7 +459,7 @@
           '<div style="margin-top:8px;font-size:17px;font-weight:700" dir="auto">' + esc(s.name) + "</div></div>" +
           '<div class="body" style="text-align:left">' +
           // ---- 1) logo
-          '<div class="upc"><div class="upt">1 · Company logo <span class="req">required</span><div class="ar">١ · شعار الشركة</div></div>' +
+          '<div class="upc"><div class="upt">1 · ' + (BCODE ? "Company logo" : "Your logo") + ' <span class="req">required</span><div class="ar">١ · ' + (BCODE ? "شعار الشركة" : "شعارك") + "</div></div>" +
           '<div class="lprev" id="lprev">' + (s.logo ? '<img alt="Current logo" src="' + s.logo + '">' : '<span>No logo yet<br><span class="ar">لا يوجد شعار بعد</span></span>') + "</div>" +
           '<p class="tip">PNG with a transparent background is best, at least 500 px wide.<br><span class="ar">يفضّل PNG بخلفية شفافة، بعرض 500 بكسل على الأقل.</span></p>' +
           '<label class="btn pick" for="flogo" tabindex="0" id="plogo">Choose logo | اختر الشعار</label><input type="file" id="flogo" accept="image/png,image/jpeg,image/webp">' +
@@ -467,7 +468,7 @@
           '<div class="upc"><div class="upt">2 · Cover photo <span class="opt">optional</span><div class="ar">٢ · صورة الغلاف (اختياري)</div></div>' +
           '<div class="cprev" id="cprev"><span>' + (s.hasCover ? "A cover photo is already online" : "No cover: your colors design is used") +
           '<br><span class="ar">' + (s.hasCover ? "صورة الغلاف موجودة" : "يُستخدم تصميم بألوانكم") + "</span></span></div>" +
-          '<p class="tip">A wide landscape photo: your office, products, building or city. At least 1500 × 500 px.<br><span class="ar">صورة عريضة: مكتبكم أو منتجاتكم أو المبنى. 1500 × 500 بكسل على الأقل.</span></p>' +
+          '<p class="tip">A wide landscape photo: your office, products, work or city. At least 1500 × 500 px.<br><span class="ar">صورة عريضة: مكتبكم أو منتجاتكم أو عملكم. 1500 × 500 بكسل على الأقل.</span></p>' +
           '<label class="btn pick" for="fcover" tabindex="0" id="pcover">Choose cover | اختر الغلاف</label><input type="file" id="fcover" accept="image/*">' +
           '<button class="btn main" id="scover" disabled>Upload cover | تحميل الغلاف</button><div id="ocover"></div></div>' +
           FOOT + "</div>";
@@ -507,7 +508,9 @@
         if (!data) return;
         var label = send.textContent;
         send.disabled = true; send.textContent = "Uploading… | جارٍ التحميل…";
-        fetch(API, { method: "POST", body: JSON.stringify({ action: "brand", code: BCODE, k: KEY, kind: kind, img: data }) })
+        var body = { action: "brand", k: KEY, kind: kind, img: data };
+        if (BCODE) body.code = BCODE; else body.card = CARD;
+        fetch(API, { method: "POST", body: JSON.stringify(body) })
           .then(function (r) { return r.json(); })
           .then(function (r) {
             send.textContent = label;
@@ -520,6 +523,7 @@
   }
 
   if (/^[A-Z0-9]{2,4}$/.test(BCODE) && /^[a-f0-9]{10}$/.test(KEY)) loadBrandPage();
+  else if (/^[a-z0-9]{6}$/.test(CARD) && /^[a-f0-9]{10}$/.test(KEY)) loadBrandPage();      // an individual's own logo & cover
   else if (/^[a-z0-9]{6}$/.test(CARD)) loadProfile();
   else app.innerHTML = '<div class="head"><div class="brand">ADLINKCARD</div><div style="opacity:.85;margin-top:4px">Smart Business Card · Grow Smarter</div></div><div class="body">' +
          msg("", "Scan a Smart Business Card to see its profile.", "امسح بطاقة الأعمال الذكية لعرض صفحتها.") + FOOT + "</div>";
