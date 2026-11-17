@@ -11,7 +11,7 @@
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <style>
   /* =========================================================
-     ADLINKCARD · Smart Business Card · profile + photo page
+     ADLINKCARD · Smart Business Card · profile page + the client's logo & cover upload page
      ========================================================= */
   :root { --main:#1E2761; --accent:#1E2761; --bg:#F3F5F9; --onMain:#fff; --onAccent:#fff; --ink:#1A1A1A; --soft:rgba(0,0,0,.6); }
   * { box-sizing:border-box; }
@@ -54,10 +54,19 @@
   .dot:nth-child(2) { animation-delay:.2s; } .dot:nth-child(3) { animation-delay:.4s; }
   @keyframes b { to { opacity:.2; } }
   @media (prefers-reduced-motion: reduce) { .dot { animation:none; } }
-  /* photo page */
-  .frame { width:150px; height:150px; border-radius:50%; margin:-75px auto 14px; border:4px solid #fff; background:#E7EEF6;
-           overflow:hidden; display:flex; align-items:center; justify-content:center; }
-  .frame img { width:100%; height:100%; object-fit:cover; }
+  /* logo & cover upload page */
+  .upc { background:#fff; border-radius:16px; padding:16px; margin-top:16px; box-shadow:0 4px 14px rgba(0,0,0,.06); }
+  .upt { font-weight:700; font-size:16px; margin-bottom:10px; }
+  .upt .ar { font-weight:600; font-size:14px; opacity:.7; margin-top:2px; }
+  .req, .opt { font-size:11px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; border-radius:20px; padding:2px 8px; margin-left:6px; vertical-align:middle; }
+  .req { background:#FBE9E7; color:#B3261E; } .opt { background:#E7EEF6; color:#1E2761; }
+  .lprev { height:120px; border-radius:12px; display:flex; align-items:center; justify-content:center; text-align:center; font-size:13px; color:var(--soft);
+           background:repeating-conic-gradient(#F1F3F6 0 25%,#fff 0 50%) 0 0/18px 18px; border:1px solid #E5E7EB; }
+  .lprev img { max-height:100px; max-width:85%; object-fit:contain; }
+  .cprev { aspect-ratio:3/1; border-radius:12px; overflow:hidden; display:flex; align-items:center; justify-content:center; text-align:center;
+           font-size:13px; color:var(--soft); background:#F1F3F6; border:1px solid #E5E7EB; }
+  .cprev img { width:100%; height:100%; object-fit:cover; }
+  .tip { font-size:13px; line-height:1.6; color:var(--soft); margin:10px 0; }
   .pick { background:#fff; color:var(--main); border:2px solid var(--main); justify-content:center; }
   .btn:disabled { opacity:.45; cursor:default; }
   .ok { background:#E5F4EC; color:#1E7B4F; } .err { background:#FBE9E7; color:#B3261E; }
@@ -73,6 +82,11 @@
                       border-radius:14px; padding:8px 16px; box-shadow:0 6px 18px rgba(0,0,0,.25); }
   .hero .logo img { max-height:44px; max-width:180px; object-fit:contain; display:block; }
   .hero .logo .brand { font-size:14px; letter-spacing:4px; font-weight:600; }
+  .hero .cov { position:absolute; inset:0; background-size:cover; background-position:center; opacity:0; transition:opacity .6s; }
+  .hero .cov.on { opacity:1; }
+  .hero .cov::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg,rgba(0,0,0,.30),rgba(0,0,0,.55)); }
+  .hero .st { position:absolute; inset:0; }
+  .hero svg.st { width:100%; height:100%; }
   .hero svg.wave { position:absolute; left:0; right:0; bottom:-1px; width:100%; height:62px; }
   .ring { width:126px; height:126px; border-radius:50%; margin:-96px auto 0; position:relative; overflow:hidden;
           display:flex; align-items:center; justify-content:center; font-family:"Playfair Display",Georgia,serif; font-size:42px; }
@@ -262,13 +276,56 @@
     [["instagram", "https://instagram.com/"], ["facebook", "https://facebook.com/"], ["linkedin", "https://linkedin.com/in/"], ["tiktok", "https://tiktok.com/@"]].forEach(function (s) {
       if (d[s[0]]) L.push("X-SOCIALPROFILE;TYPE=" + s[0] + ":" + social(d[s[0]], s[1]));
     });
-    if (d.photo) L.push(fold("PHOTO;ENCODING=b;TYPE=JPEG:" + d.photo.split(",")[1]));
+    if (d.logo) L.push(fold("PHOTO;ENCODING=b;TYPE=PNG:" + d.logo.split(",")[1]));      // the company logo as contact picture
     L.push("END:VCARD");
     var blob = new Blob([L.join("\r\n") + "\r\n"], { type: "text/vcard;charset=utf-8" });
     var a = document.createElement("a");
     a.href = URL.createObjectURL(blob); a.download = (d.name || "contact").replace(/[\\\/:*?"<>|]/g, "") + ".vcf";
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+  }
+
+  /* ---------- top of the profile: one of 4 designs in the company colors, or the company's cover photo ---------- */
+  function heroStyle(st, m, a) {
+    var glow = '<div class="glow" style="background:radial-gradient(circle,' + a + ' 0%,transparent 65%)"></div>';
+    if (st === "GLOW") {
+      return '<div class="st" style="background:radial-gradient(circle at 18% 30%,' + a + '55 0,transparent 34%),' +
+             'radial-gradient(circle at 82% 18%,' + shade(m, .45) + '88 0,transparent 30%),radial-gradient(circle at 60% 85%,' + a + '33 0,transparent 40%)"></div>' +
+             '<svg class="st" viewBox="0 0 330 225" preserveAspectRatio="xMidYMid slice">' +
+             [[40, 60, 22], [110, 30, 9], [250, 70, 16], [290, 150, 26], [170, 120, 7], [70, 160, 12], [220, 35, 5]].map(function (c) {
+               return '<circle cx="' + c[0] + '" cy="' + c[1] + '" r="' + c[2] + '" fill="#fff" opacity=".07"/>'; }).join("") + "</svg>";
+    }
+    if (st === "WAVES") {
+      var w = "";
+      for (var i = 0; i < 6; i++) {
+        var y = 40 + i * 26;
+        w += '<path d="M0 ' + y + ' C 80 ' + (y - 30) + ', 160 ' + (y + 30) + ', 330 ' + (y - 10) + '" fill="none" stroke="' + (i % 2 ? "#fff" : a) +
+             '" stroke-width="' + (i % 2 ? 1 : 1.6) + '" opacity="' + (i % 2 ? .12 : .35) + '"/>';
+      }
+      return '<svg class="st" viewBox="0 0 330 225" preserveAspectRatio="none">' + w + "</svg>" + glow;
+    }
+    if (st === "GEO") {
+      var p = "", pts = [[0, 0, 120, 0, 40, 110], [120, 0, 230, 0, 170, 95], [230, 0, 330, 0, 330, 80], [40, 110, 170, 95, 90, 225],
+                         [170, 95, 330, 80, 260, 225], [0, 0, 40, 110, 0, 170], [330, 80, 330, 225, 260, 225]];
+      pts.forEach(function (q, i) {
+        p += '<polygon points="' + q[0] + "," + q[1] + " " + q[2] + "," + q[3] + " " + q[4] + "," + q[5] + '" fill="' + (i % 3 ? "#fff" : a) +
+             '" opacity="' + [.06, .1, .04, .08, .05, .12, .07][i] + '"/>';
+      });
+      return '<svg class="st" viewBox="0 0 330 225" preserveAspectRatio="none">' + p + "</svg>";
+    }
+    return '<div class="lines"></div>' + glow;                      // LINES (the classic one)
+  }
+  var COVER = null;                                                // loaded once (language switch re-draws the page)
+  function showCover() {
+    var el = document.getElementById("cov");
+    if (COVER && el) { el.style.backgroundImage = "url(" + COVER + ")"; el.className = "cov on"; }
+  }
+  function loadCover(d) {
+    if (!d.hasCover || !d.code) return;
+    if (COVER) { showCover(); return; }
+    fetch(API + "?api=cover&code=" + encodeURIComponent(d.code)).then(function (r) { return r.json(); }).then(function (r) {
+      if (r.img) { COVER = r.img; showCover(); }
+    }).catch(function () {});
   }
 
   /* ---------- profile ---------- */
@@ -313,22 +370,19 @@
                (d.huawei ? '<a class="lux hw" href="' + esc(d.huawei) + '">' + svg("phone") + t.huawei + "</a>" : "") + "</div>";
     }
     app.innerHTML =
-      '<div class="hero" style="background:linear-gradient(140deg,' + shade(m, .12) + " 0%," + m + " 45%," + shade(m, -.35) + ' 100%)">' +
-        '<div class="lines"></div><div class="glow" style="background:radial-gradient(circle,' + a + ' 0%,transparent 65%)"></div>' +
+      '<div class="hero" id="hero" style="background:linear-gradient(140deg,' + shade(m, .12) + " 0%," + m + " 45%," + shade(m, -.35) + ' 100%)">' +
+        heroStyle(d.cover, m, a) + '<div class="cov" id="cov"></div>' +
         '<div class="lang"><button data-l="en"' + (LANG === "en" ? ' class="on"' : "") + '>EN</button><button data-l="ar"' + (LANG === "ar" ? ' class="on"' : "") + '>ع</button></div>' +
-        // top: the logo on a white pill (readable for any logo colors). When the logo is already in the
-        // circle (no photo), the top shows the company name instead, so the logo is not shown twice.
-        '<div class="logo">' + (d.logo && d.photo ? '<span class="pill"><img alt="' + esc(d.company || "Logo") + '" src="' + d.logo + '"></span>'
-                                       : '<div class="brand">' + esc((d.company || "ADLINKCARD").toUpperCase()) + "</div>") + "</div>" +
+        // top: the company name (the logo is in the circle)
+        '<div class="logo"><div class="brand">' + esc((d.company || "ADLINKCARD").toUpperCase()) + "</div></div>" +
         '<svg class="wave" viewBox="0 0 330 62" preserveAspectRatio="none"><path d="M0 34 C 90 70, 240 0, 330 30 L330 62 L0 62 Z" fill="' + bg + '"/>' +
         '<path d="M0 40 C 100 72, 230 8, 330 38" fill="none" stroke="' + a + '" stroke-width="2"/></svg>' +
       "</div>" +
-      // circle: the photo; no photo -> the client's logo on white; no logo either -> initials
-      '<div class="ring" style="background:' + (!d.photo && d.logo ? "#fff" : grad(m, .15, -.2)) + ";color:" + on(m) +
+      // circle: the company logo on white; no logo yet -> initials of the company
+      '<div class="ring" style="background:' + (d.logo ? "#fff" : grad(m, .15, -.2)) + ";color:" + on(m) +
         ";box-shadow:0 0 0 4px " + bg + ",0 0 0 7px " + a + ',0 10px 24px rgba(0,0,0,.28)">' +
-        (d.photo ? '<img alt="' + esc(d.name) + '" src="' + d.photo + '">'
-                 : d.logo ? '<img alt="' + esc(d.company || "Logo") + '" src="' + d.logo + '" style="object-fit:contain;padding:18px;box-sizing:border-box">'
-                 : esc(initials(d.name))) + "</div>" +
+        (d.logo ? '<img alt="' + esc(d.company || "Logo") + '" src="' + d.logo + '" style="object-fit:contain;padding:18px;box-sizing:border-box">'
+                : esc(initials(d.company || d.name))) + "</div>" +
       '<div class="nm" dir="auto">' + esc(d.name) + "</div>" +
       (d.job ? '<div class="tt" dir="auto" style="color:' + tt + '">' + esc(d.job) + "</div>" : "") +
       (d.company ? '<div class="co" dir="auto">' + esc(d.company) + "</div>" : "") +
@@ -357,6 +411,7 @@
       navigator.clipboard.writeText(d.link).then(function () { b.lastChild.textContent = T[LANG].copied; }).catch(function () { prompt("Copy this link:", d.link); });
     };
     if (window.qrcode) drawQR(document.getElementById("qr"), d.link, d);
+    loadCover(d);
   }
 
   function showPhone(n) {             // 96170123456 -> +961 70 123 456
@@ -390,55 +445,81 @@
       });
   }
 
-  /* ---------- photo upload (?c=...&k=...) ---------- */
-  function loadPhotoPage() {
-    fetch(API + "?api=check&card=" + encodeURIComponent(CARD) + "&k=" + encodeURIComponent(KEY))
+  /* ---------- the client's logo & cover upload page (?b=CODE&k=key) ---------- */
+  var BCODE = (Q.get("b") || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+  function loadBrandPage() {
+    fetch(API + "?api=brand&code=" + encodeURIComponent(BCODE) + "&k=" + encodeURIComponent(KEY))
       .then(function (r) { return r.json(); })
       .then(function (s) {
         if (!s.ok) { app.innerHTML = '<div class="body" style="padding-top:40px">' + msg("err", "This link is not valid.", "هذا الرابط غير صالح.") + FOOT + "</div>"; return; }
+        document.title = s.name + " · Logo & cover";
         app.innerHTML =
-          '<div class="head"><div class="brand">YOUR CARD PHOTO</div><div class="ar" style="opacity:.85">صورة بطاقتك</div></div>' +
-          '<div class="body"><div class="frame" id="frame">' + svg("save").replace("<svg", '<svg style="width:70px;fill:#1E2761;opacity:.3"') + "</div>" +
-          '<h1 dir="auto">' + esc(s.name) + '</h1><div class="sub">' + esc(s.company) + "</div>" +
-          (s.photo ? msg("", "A photo was already received. A new one will replace it.", "تم استلام صورة سابقاً. الصورة الجديدة ستستبدلها.") : "") +
-          '<p style="font-size:14px;line-height:1.6">A clear photo of your face, looking at the camera.<br><span class="ar">صورة واضحة للوجه، النظر إلى الكاميرا.</span></p>' +
-          '<label class="btn pick" for="file" tabindex="0" id="pickBtn">Choose photo | اختر صورة</label><input type="file" id="file" accept="image/*">' +
-          '<button class="btn main" id="send" disabled>Upload photo | تحميل الصورة</button><div id="out"></div>' + FOOT + "</div>";
-        var jpeg = null, out = document.getElementById("out"), send = document.getElementById("send");
-        document.getElementById("pickBtn").onkeydown = function (ev) { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); document.getElementById("file").click(); } };
-        document.getElementById("file").onchange = function (ev) {
-          var f = ev.target.files[0]; if (!f) return;
-          jpeg = null; send.disabled = true; out.innerHTML = "";
-          var img = new Image();
-          img.onload = function () {
-            var side = Math.min(img.naturalWidth, img.naturalHeight), S = Math.min(700, side);    // square crop, 700px
-            var cv = document.createElement("canvas"); cv.width = S; cv.height = S;
-            var cx = cv.getContext("2d"); cx.fillStyle = "#fff"; cx.fillRect(0, 0, S, S);
-            cx.drawImage(img, (img.naturalWidth - side) / 2, (img.naturalHeight - side) / 2, side, side, 0, 0, S, S);
-            var url = cv.toDataURL("image/jpeg", 0.85); jpeg = url.split(",")[1];
-            document.getElementById("frame").innerHTML = '<img alt="Selected photo" src="' + url + '">';
-            send.disabled = false; URL.revokeObjectURL(img.src);
-          };
-          img.onerror = function () { out.innerHTML = msg("err", "This photo format is not supported. Choose a JPG or PNG.", "صيغة الصورة غير مدعومة. اختر JPG أو PNG."); };
-          img.src = URL.createObjectURL(f);
-        };
-        send.onclick = function () {
-          if (!jpeg) return;
-          send.disabled = true; send.textContent = "Uploading… | جارٍ التحميل…";
-          fetch(API, { method: "POST", body: JSON.stringify({ action: "photo", card: CARD, k: KEY, img: jpeg }) })
-            .then(function (r) { return r.json(); })
-            .then(function (r) {
-              send.textContent = "Upload photo | تحميل الصورة";
-              if (r.ok) { out.innerHTML = msg("ok", "Photo received. Thank you! 🎉", "تم استلام الصورة. شكراً لكم!"); jpeg = null; try { localStorage.removeItem("sbc_" + CARD); } catch (e) {} }
-              else { send.disabled = false; out.innerHTML = msg("err", "The photo was not uploaded. Please try again.", "لم يتم تحميل الصورة. حاول مجدداً."); }
-            })
-            .catch(function () { send.disabled = false; send.textContent = "Upload photo | تحميل الصورة"; out.innerHTML = msg("err", "Check your internet and tap Upload again.", "تحقق من الإنترنت واضغط تحميل مجدداً."); });
-        };
+          '<div class="head" style="padding-bottom:24px"><div class="brand">YOUR LOGO &amp; COVER</div><div class="ar" style="opacity:.85">الشعار وصورة الغلاف</div>' +
+          '<div style="margin-top:8px;font-size:17px;font-weight:700" dir="auto">' + esc(s.name) + "</div></div>" +
+          '<div class="body" style="text-align:left">' +
+          // ---- 1) logo
+          '<div class="upc"><div class="upt">1 · Company logo <span class="req">required</span><div class="ar">١ · شعار الشركة</div></div>' +
+          '<div class="lprev" id="lprev">' + (s.logo ? '<img alt="Current logo" src="' + s.logo + '">' : '<span>No logo yet<br><span class="ar">لا يوجد شعار بعد</span></span>') + "</div>" +
+          '<p class="tip">PNG with a transparent background is best, at least 500 px wide.<br><span class="ar">يفضّل PNG بخلفية شفافة، بعرض 500 بكسل على الأقل.</span></p>' +
+          '<label class="btn pick" for="flogo" tabindex="0" id="plogo">Choose logo | اختر الشعار</label><input type="file" id="flogo" accept="image/png,image/jpeg,image/webp">' +
+          '<button class="btn main" id="slogo" disabled>Upload logo | تحميل الشعار</button><div id="ologo"></div></div>' +
+          // ---- 2) cover
+          '<div class="upc"><div class="upt">2 · Cover photo <span class="opt">optional</span><div class="ar">٢ · صورة الغلاف (اختياري)</div></div>' +
+          '<div class="cprev" id="cprev"><span>' + (s.hasCover ? "A cover photo is already online" : "No cover: your colors design is used") +
+          '<br><span class="ar">' + (s.hasCover ? "صورة الغلاف موجودة" : "يُستخدم تصميم بألوانكم") + "</span></span></div>" +
+          '<p class="tip">A wide landscape photo: your office, products, building or city. At least 1500 × 500 px.<br><span class="ar">صورة عريضة: مكتبكم أو منتجاتكم أو المبنى. 1500 × 500 بكسل على الأقل.</span></p>' +
+          '<label class="btn pick" for="fcover" tabindex="0" id="pcover">Choose cover | اختر الغلاف</label><input type="file" id="fcover" accept="image/*">' +
+          '<button class="btn main" id="scover" disabled>Upload cover | تحميل الغلاف</button><div id="ocover"></div></div>' +
+          FOOT + "</div>";
+        setup("logo"); setup("cover");
       })
       .catch(function () { app.innerHTML = '<div class="body" style="padding-top:40px">' + msg("err", "Check your internet and try again.", "تحقق من الإنترنت وحاول مجدداً.") + "</div>"; });
+
+    function setup(kind) {
+      var data = null, isLogo = kind === "logo";
+      var out = document.getElementById("o" + kind), send = document.getElementById("s" + kind), prev = document.getElementById(isLogo ? "lprev" : "cprev");
+      document.getElementById("p" + kind).onkeydown = function (ev) { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); document.getElementById("f" + kind).click(); } };
+      document.getElementById("f" + kind).onchange = function (ev) {
+        var f = ev.target.files[0]; if (!f) return;
+        data = null; send.disabled = true; out.innerHTML = "";
+        var img = new Image();
+        img.onload = function () {
+          var cv = document.createElement("canvas"), cx = cv.getContext("2d"), url;
+          if (isLogo) {                                  // logo: keep its shape and transparency, max 800 px
+            var k = Math.min(1, 800 / Math.max(img.naturalWidth, img.naturalHeight));
+            cv.width = Math.round(img.naturalWidth * k); cv.height = Math.round(img.naturalHeight * k);
+            cx.drawImage(img, 0, 0, cv.width, cv.height);
+            url = cv.toDataURL("image/png");
+          } else {                                       // cover: cut to 3:1 from the middle, 1500 x 500
+            var W = 1500, H = 500, s2 = Math.max(W / img.naturalWidth, H / img.naturalHeight);
+            cv.width = W; cv.height = H;
+            cx.drawImage(img, (W - img.naturalWidth * s2) / 2, (H - img.naturalHeight * s2) / 2, img.naturalWidth * s2, img.naturalHeight * s2);
+            url = cv.toDataURL("image/jpeg", 0.84);
+          }
+          data = url.split(",")[1];
+          prev.innerHTML = '<img alt="Selected ' + kind + '" src="' + url + '">';
+          send.disabled = false; URL.revokeObjectURL(img.src);
+        };
+        img.onerror = function () { out.innerHTML = msg("err", "This file is not supported. Choose a PNG or JPG.", "صيغة الملف غير مدعومة. اختر PNG أو JPG."); };
+        img.src = URL.createObjectURL(f);
+      };
+      send.onclick = function () {
+        if (!data) return;
+        var label = send.textContent;
+        send.disabled = true; send.textContent = "Uploading… | جارٍ التحميل…";
+        fetch(API, { method: "POST", body: JSON.stringify({ action: "brand", code: BCODE, k: KEY, kind: kind, img: data }) })
+          .then(function (r) { return r.json(); })
+          .then(function (r) {
+            send.textContent = label;
+            if (r.ok) { data = null; out.innerHTML = msg("ok", (isLogo ? "Logo" : "Cover") + " received. Thank you! 🎉", isLogo ? "تم استلام الشعار. شكراً لكم!" : "تم استلام صورة الغلاف. شكراً لكم!"); }
+            else { send.disabled = false; out.innerHTML = msg("err", "It was not uploaded. Please try again.", "لم يتم التحميل. حاول مجدداً."); }
+          })
+          .catch(function () { send.disabled = false; send.textContent = label; out.innerHTML = msg("err", "Check your internet and tap Upload again.", "تحقق من الإنترنت واضغط تحميل مجدداً."); });
+      };
+    }
   }
 
-  if (/^[a-z0-9]{6}$/.test(CARD) && /^[a-f0-9]{10}$/.test(KEY)) loadPhotoPage();
+  if (/^[A-Z0-9]{2,4}$/.test(BCODE) && /^[a-f0-9]{10}$/.test(KEY)) loadBrandPage();
   else if (/^[a-z0-9]{6}$/.test(CARD)) loadProfile();
   else app.innerHTML = '<div class="head"><div class="brand">ADLINKCARD</div><div style="opacity:.85;margin-top:4px">Smart Business Card · Grow Smarter</div></div><div class="body">' +
          msg("", "Scan a Smart Business Card to see its profile.", "امسح بطاقة الأعمال الذكية لعرض صفحتها.") + FOOT + "</div>";
