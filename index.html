@@ -84,6 +84,8 @@
   .hero .logo .brand { font-size:14px; letter-spacing:4px; font-weight:600; }
   .hero .cov { position:absolute; inset:0; background-size:cover; background-position:center; opacity:0; transition:opacity .6s; }
   .hero .cov.on { opacity:1; }
+  .hero .demo { display:inline-block; margin-top:9px; padding:3px 11px; border-radius:11px; font-size:10px; font-weight:700;
+                letter-spacing:2px; color:#F3D98B; background:rgba(0,0,0,.28); border:1px solid rgba(233,196,106,.8); }
   .hero .cov::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg,rgba(0,0,0,.30),rgba(0,0,0,.55)); }
   .hero .st { position:absolute; inset:0; }
   .hero svg.st { width:100%; height:100%; }
@@ -414,7 +416,9 @@
         heroStyle(d.cover, m, a) + '<div class="cov" id="cov"></div>' +
         '<div class="lang"><button data-l="en"' + (LANG === "en" ? ' class="on"' : "") + '>EN</button><button data-l="ar"' + (LANG === "ar" ? ' class="on"' : "") + '>ع</button></div>' +
         // top: the company name (the logo is in the circle)
-        '<div class="logo"><div class="brand">' + esc((d.company || "ADLINKCARD").toUpperCase()) + "</div></div>" +
+        '<div class="logo"><div class="brand">' + esc((d.company || "ADLINKCARD").toUpperCase()) + "</div>" +
+          // demo client: a small "Sample" tag (gone when the client becomes real)
+          (d.demo ? '<div class="demo">' + (LANG === "ar" ? "عيّنة · ADLINKCARD" : "SAMPLE · ADLINKCARD") + "</div>" : "") + "</div>" +
         '<svg class="wave" viewBox="0 0 330 62" preserveAspectRatio="none"><path d="M0 34 C 90 70, 240 0, 330 30 L330 62 L0 62 Z" fill="' + bg + '"/>' +
         '<path d="M0 40 C 100 72, 230 8, 330 38" fill="none" stroke="' + a + '" stroke-width="2"/></svg>' +
       "</div>" +
