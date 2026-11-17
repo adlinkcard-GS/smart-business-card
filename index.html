@@ -329,6 +329,46 @@
   }
 
   /* ---------- profile ---------- */
+  // The logo fills the circle: its empty margins are cut, the circle takes the logo's own background
+  // color (black logo -> black circle), and the logo is made as big as the circle allows.
+  function fitLogo(im) {
+    if (im.getAttribute("data-fit")) return;
+    im.setAttribute("data-fit", "1");
+    try {
+      var w = im.naturalWidth, h = im.naturalHeight;
+      if (!w || !h) return;
+      var c = document.createElement("canvas"); c.width = w; c.height = h;
+      var x = c.getContext("2d"); x.drawImage(im, 0, 0);
+      var px = x.getImageData(0, 0, w, h).data;
+      var at = function (i, j) { var k = (j * w + i) * 4; return [px[k], px[k + 1], px[k + 2], px[k + 3]]; };
+      var cs = [at(0, 0), at(w - 1, 0), at(0, h - 1), at(w - 1, h - 1)], clear = true, same = true, i, j, k;
+      for (i = 0; i < 4; i++) {
+        if (cs[i][3] > 30) clear = false;
+        if (Math.abs(cs[i][0] - cs[0][0]) + Math.abs(cs[i][1] - cs[0][1]) + Math.abs(cs[i][2] - cs[0][2]) > 60) same = false;
+      }
+      if (!clear && !same) { im.style.padding = "8px"; return; }          // busy picture: keep it whole
+      var b = cs[0], x0 = w, y0 = h, x1 = -1, y1 = -1;
+      for (j = 0; j < h; j++) for (i = 0; i < w; i++) {
+        k = (j * w + i) * 4;
+        var ink = clear ? px[k + 3] > 30
+                        : (Math.abs(px[k] - b[0]) + Math.abs(px[k + 1] - b[1]) + Math.abs(px[k + 2] - b[2]) > 60 && px[k + 3] > 30);
+        if (ink) { if (i < x0) x0 = i; if (i > x1) x1 = i; if (j < y0) y0 = j; if (j > y1) y1 = j; }
+      }
+      if (x1 < 0) return;
+      var bw = x1 - x0 + 1, bh = y1 - y0 + 1, D = 300;
+      var sc = 0.86 * D / Math.sqrt(bw * bw + bh * bh);               // as big as fits inside the circle
+      var o = document.createElement("canvas"); o.width = D; o.height = D;
+      var y = o.getContext("2d");
+      var col = clear ? "#ffffff" : "rgb(" + b[0] + "," + b[1] + "," + b[2] + ")";
+      y.fillStyle = col; y.fillRect(0, 0, D, D);
+      y.imageSmoothingQuality = "high";
+      y.drawImage(c, x0, y0, bw, bh, (D - bw * sc) / 2, (D - bh * sc) / 2, bw * sc, bh * sc);
+      im.style.padding = "0";
+      im.parentNode.style.background = col;
+      im.src = o.toDataURL("image/png");
+    } catch (e) {}
+  }
+
   function renderProfile(d) {
     var saved = null;
     try { saved = localStorage.getItem("sbc_lang_" + CARD); } catch (e) {}
@@ -412,6 +452,8 @@
     };
     if (window.qrcode) drawQR(document.getElementById("qr"), d.link, d);
     loadCover(d);
+    var li = app.querySelector(".ring img");
+    if (li) { if (li.complete) fitLogo(li); else li.addEventListener("load", function () { fitLogo(li); }); }
   }
 
   function showPhone(n) {             // 96170123456 -> +961 70 123 456
